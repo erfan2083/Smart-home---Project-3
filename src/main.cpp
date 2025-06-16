@@ -6,11 +6,11 @@
 
   
 // ------------------ WiFi Setup ------------------ 
-const char* ssid = "Alireza";  // Enter SSID here 
-const char* password = "Er13496063#";  //Enter Password here 
+const char* ssid = "Wokwi-GUEST";  // Enter SSID here 
+const char* password = "";  //Enter Password here 
 
-IPAddress local_ip(192, 168, 1, 1);
-IPAddress gateway(192, 168, 1, 1);
+IPAddress local_ip(193, 186, 4, 40);
+IPAddress gateway(193, 186, 4, 40);
 IPAddress subnet(255, 255, 255, 0);
   
 AsyncWebServer server(80);
@@ -21,19 +21,16 @@ void setup() {
   Serial.begin(115200);
 
 
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
+ WiFi.begin(ssid, password, 6);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(100);
     Serial.print(".");
   }
-
-  Serial.println();
-  Serial.print("Connected! IP Address: ");
+  Serial.println(" Connected!");
   Serial.println(WiFi.localIP());
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", "<h1>Smart Home via Router</h1>");
+    request->send(200, "text/html", "<h1>Hello from ESP32!</h1>");
   });
 
   server.begin();
