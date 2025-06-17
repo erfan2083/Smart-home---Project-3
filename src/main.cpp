@@ -3,6 +3,7 @@
 #include <WiFi.h> 
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
+#include <LittleFS.h>
 
   
 // ------------------ WiFi Setup ------------------ 
@@ -30,7 +31,7 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", "<h1>Hello from ESP32!</h1>");
+    request->send(LittleFS, "pages/smart-home.html", "text/html");
   });
 
   server.begin();
