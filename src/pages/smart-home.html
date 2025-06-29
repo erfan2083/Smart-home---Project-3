@@ -349,8 +349,8 @@
                         <div id="temperature-bar" class="bg-gradient-to-r from-blue-300 to-red-500 h-full rounded-full" style="width: 60%"></div>
                     </div>
                     <div class="flex justify-between w-full mt-2 text-xs text-white">
-                        <span>16°C</span>
-                        <span>30°C</span>
+                        <span>-40°C</span>
+                        <span>80°C</span>
                     </div>
                 </div>
                 
@@ -768,14 +768,14 @@
             currentTemp += change;
             
             // Keep temperature within reasonable bounds
-            if (currentTemp < 16) currentTemp = 16;
-            if (currentTemp > 30) currentTemp = 30;
+            if (currentTemp < -40) currentTemp = -40;
+            if (currentTemp > 80) currentTemp = 80;
             
             setState('temperature', currentTemp.toFixed(1));
             temperatureValue.textContent = currentTemp.toFixed(1) + '°C';
             
             // Update temperature bar (16°C to 30°C range)
-            const percentage = ((currentTemp - 16) / (30 - 16)) * 100;
+            const percentage = ((currentTemp - (-40)) / (80 - (-40))) * 100;
             temperatureBar.style.width = percentage + '%';
         }
         
