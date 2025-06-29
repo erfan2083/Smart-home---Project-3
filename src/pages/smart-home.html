@@ -744,8 +744,7 @@
                 // Increase energy usage when turning on AC
                 updateEnergyUsage(30);
                 
-                // AC affects temperature
-                updateTemperature(-1.5);
+
             } else {
                 ac.classList.remove('on');
                 ac.classList.add('off');
@@ -757,15 +756,13 @@
                 // Decrease energy usage when turning off AC
                 updateEnergyUsage(-30);
                 
-                // Temperature rises when AC is off
-                updateTemperature(1.5);
             }
         }
         
         // Update temperature
         function updateTemperature(change) {
             let currentTemp = parseFloat(getState('temperature'));
-            currentTemp += change;
+            currentTemp = change;
             
             // Keep temperature within reasonable bounds
             if (currentTemp < -40) currentTemp = -40;
@@ -782,7 +779,7 @@
         // Update humidity
         function updateHumidity(change) {
             let currentHumidity = parseInt(getState('humidity'));
-            currentHumidity += change;
+            currentHumidity = change;
             
             // Keep humidity within bounds
             if (currentHumidity < 20) currentHumidity = 20;
@@ -826,7 +823,7 @@
         // Simulate automatic mode for bathroom
         function simulateBathroomAutoMode() {
             // Randomly toggle bathroom light to simulate motion detection
-            const isOn = Math.random() > 0.5;
+            const isOn = false;
             if (isOn) {
                 bathroomLight.classList.remove('off');
                 bathroomLight.classList.add('on');
@@ -835,8 +832,7 @@
                 bathroomStatus.classList.add('bg-blue-500');
                 setState('bathroom-light', 'on');
                 
-                // Bathroom usage affects humidity
-                updateHumidity(5);
+
             } else {
                 bathroomLight.classList.remove('on');
                 bathroomLight.classList.add('off');
@@ -845,8 +841,6 @@
                 bathroomStatus.classList.add('bg-gray-600');
                 setState('bathroom-light', 'off');
                 
-                // Humidity decreases when bathroom not in use
-                updateHumidity(-3);
             }
         }
 
@@ -854,7 +848,7 @@
         function simulateAutoMode() {
             // Bedroom auto mode
             if (bedroomAuto.checked) {
-                const bedroomOn = Math.random() > 0.5;
+                const bedroomOn = false;
                 if (bedroomOn) {
                     bedroomLight1.classList.remove('off');
                     bedroomLight1.classList.add('on');
@@ -905,7 +899,7 @@
             
             // Living room lights auto mode
             if (livingRoomLightsAuto.checked) {
-                const livingRoomOn = Math.random() > 0.4;
+                const livingRoomOn = false;
                 if (livingRoomOn) {
                     livingRoomLight1.classList.remove('off');
                     livingRoomLight1.classList.add('on');
@@ -976,7 +970,7 @@
             
             // Living room AC auto mode
             if (livingRoomACAuto.checked) {
-                const acOn = Math.random() > 0.6;
+                const acOn = false;
                 if (acOn) {
                     livingRoomAC.classList.remove('off');
                     livingRoomAC.classList.add('on');
@@ -985,9 +979,7 @@
                     livingRoomACBtn.classList.add('bg-blue-500');
                     setState('livingroom-ac', 'on');
                     
-                    // AC affects temperature and humidity
-                    updateTemperature(-0.5);
-                    updateHumidity(-2);
+             
                 } else {
                     livingRoomAC.classList.remove('on');
                     livingRoomAC.classList.add('off');
@@ -996,9 +988,6 @@
                     livingRoomACBtn.classList.add('bg-gray-600');
                     setState('livingroom-ac', 'off');
                     
-                    // Temperature and humidity rise when AC is off
-                    updateTemperature(0.3);
-                    updateHumidity(1);
                 }
                 
                 livingRoomACBtn.disabled = true;
@@ -1016,14 +1005,6 @@
             // Update room indicators
             updateRoomIndicators();
             
-            // Randomly fluctuate temperature and humidity
-            if (Math.random() > 0.7) {
-                updateTemperature((Math.random() - 0.5) * 0.5);
-            }
-            
-            if (Math.random() > 0.7) {
-                updateHumidity(Math.floor((Math.random() - 0.5) * 3));
-            }
         }
         
         // Update room indicators on the main page
@@ -1147,6 +1128,8 @@
         simulateBathroomAutoMode();
         simulateAutoMode();
         initializeStats();
+        updateTemperature(20);
+        updateHumidity(20);
         
         // Initial page setup
         navigateTo('main-page');
