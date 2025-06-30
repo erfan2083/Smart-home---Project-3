@@ -5,6 +5,7 @@
 #include <AsyncTCP.h>
 #include <DHT.h>
 #include <htmlPage.h>
+#include <uri/UriBraces.h>
 
 
 // ------------------------ Pin Definitions ------------------------
@@ -140,50 +141,49 @@ void setup() {
     req->send(200, "text/html", smartHomeHTML);
   });
 
-  server.on("/api/status", HTTP_GET, [](AsyncWebServerRequest *req){
-    String json = "{";
-    json += "\"temperature\":" + String(temperature) + ",";
-    json += "\"humidity\":" + String(humidity) + ",";
-    json += "\"pirLiving\":" + String(pirLiving ? "true" : "false") + ",";
-    json += "\"pirBedroom\":" + String(pirBedroom ? "true" : "false") + ",";
-    json += "\"pirBathroom\":" + String(pirBathroom ? "true" : "false") + ",";
-    json += "\"bathroomLight\":" + String(bathroomLight ? "true" : "false") + ",";
-    json += "\"ac\":" + String(acState ? "true" : "false") + ",";
-    json += "\"modeLiving\":" + String(modeLiving ? "true" : "false") + ",";
-    json += "\"modeBedroom\":" + String(modeBedroom ? "true" : "false") + ",";
-    json += "\"modeAC\":" + String(modeAC ? "true" : "false") + ",";
-    json += "\"livingLights\":[" + String(livingLights[0]) + "," + String(livingLights[1]) + "," + String(livingLights[2]) + "],";
-    json += "\"bedroomLights\":[" + String(bedroomLights[0]) + "," + String(bedroomLights[1]) + "]";
-    json += "}";
-    req->send(200, "application/json", json);
+  server.on("/api/light", HTTP_GET, [](AsyncWebServerRequest *req){
+    if (req->hasParam("id") ){
+      String id = req->getParam("id")->value();
+      Serial.println(id);
+      if (id == "bedroom-light-1-btn"){
+        Serial.println("done");
+      }
+      
+      String oo = "on";
+      if (oo == "on"){
+        Serial.println("ok");
+      }
+    }
+    
+    req->send(200, "text/plain", "done");
   });
 
-  server.on("/api/control", HTTP_POST, [](AsyncWebServerRequest *req){
-    if (req->hasParam("section", true) && req->hasParam("index", true) && req->hasParam("state", true)) {
-      String section = req->getParam("section", true)->value();
-      int index = req->getParam("index", true)->value().toInt();
-      bool state = req->getParam("state", true)->value() == "on";
-      if (section == "living") livingLights[index] = state;
-      else if (section == "bedroom") bedroomLights[index] = state;
-      else if (section == "ac") acState = state;
-      req->send(200, "text/plain", "OK");
-    } else {
-      req->send(400, "text/plain", "Missing parameters");
-    }
-  });
+  // server.on("/api/control", HTTP_POST, [](AsyncWebServerRequest *req){
+  //   if (req->hasParam("section", true) && req->hasParam("index", true) && req->hasParam("state", true)) {
+  //     String section = req->getParam("section", true)->value();
+  //     int index = req->getParam("index", true)->value().toInt();
+  //     bool state = req->getParam("state", true)->value() == "on";
+  //     if (section == "living") livingLights[index] = state;
+  //     else if (section == "bedroom") bedroomLights[index] = state;
+  //     else if (section == "ac") acState = state;
+  //     req->send(200, "text/plain", "OK");
+  //   } else {
+  //     req->send(400, "text/plain", "Missing parameters");
+  //   }
+  // });
 
-  server.on("/api/mode", HTTP_POST, [](AsyncWebServerRequest *req){
-    if (req->hasParam("target", true) && req->hasParam("state", true)) {
-      String t = req->getParam("target", true)->value();
-      bool state = req->getParam("state", true)->value() == "auto";
-      if (t == "living") modeLiving = state;
-      else if (t == "bedroom") modeBedroom = state;
-      else if (t == "ac") modeAC = state;
-      req->send(200, "text/plain", "Mode Set");
-    } else {
-      req->send(400, "text/plain", "Missing parameters");
-    }
-  });
+  // server.on("/api/mode", HTTP_POST, [](AsyncWebServerRequest *req){
+  //   if (req->hasParam("target", true) && req->hasParam("state", true)) {
+  //     String t = req->getParam("target", true)->value();
+  //     bool state = req->getParam("state", true)->value() == "auto";
+  //     if (t == "living") modeLiving = state;
+  //     else if (t == "bedroom") modeBedroom = state;
+  //     else if (t == "ac") modeAC = state;
+  //     req->send(200, "text/plain", "Mode Set");
+  //   } else {
+  //     req->send(400, "text/plain", "Missing parameters");
+  //   }
+  // });
 
   server.begin();
 

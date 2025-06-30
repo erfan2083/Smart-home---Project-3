@@ -708,6 +708,9 @@
 
         // Toggle light function
         function toggleLight(light, button, stateKey) {
+            fetch("/api/light?id=" + button.id)
+            .then(res => res.text())
+
             if (light.classList.contains('off')) {
                 light.classList.remove('off');
                 light.classList.add('on');

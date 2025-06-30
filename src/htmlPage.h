@@ -713,6 +713,11 @@ String smartHomeHTML = R"rawliteral(
 
         // Toggle light function
         function toggleLight(light, button, stateKey) {
+            fetch("/api/light?id=" + button.id)
+            .then(res => res.text())
+
+            console.log("/api/light?id=" + button.id );
+
             if (light.classList.contains('off')) {
                 light.classList.remove('off');
                 light.classList.add('on');
