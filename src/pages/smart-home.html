@@ -782,8 +782,8 @@
             currentHumidity = change;
             
             // Keep humidity within bounds
-            if (currentHumidity < 20) currentHumidity = 20;
-            if (currentHumidity > 80) currentHumidity = 80;
+            if (currentHumidity < 0) currentHumidity = 20;
+            if (currentHumidity > 100) currentHumidity = 80;
             
             setState('humidity', currentHumidity);
             humidityValue.textContent = currentHumidity + '%';
@@ -1101,7 +1101,7 @@
         function initializeStats() {
             // Set initial temperature
             temperatureValue.textContent = getState('temperature') + '°C';
-            const tempPercentage = ((parseFloat(getState('temperature')) - 16) / (30 - 16)) * 100;
+            const tempPercentage = ((parseFloat(getState('temperature')) - (-40)) / (80 - (-40))) * 100;
             temperatureBar.style.width = tempPercentage + '%';
             
             // Set initial humidity
@@ -1129,7 +1129,7 @@
         simulateAutoMode();
         initializeStats();
         updateTemperature(20);
-        updateHumidity(20);
+        updateHumidity(50);
         
         // Initial page setup
         navigateTo('main-page');

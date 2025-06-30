@@ -4,6 +4,8 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include <DHT.h>
+#include <htmlPage.h>
+
 
 // ------------------------ Pin Definitions ------------------------
 #define DHTPIN 15
@@ -133,12 +135,9 @@ void setup() {
   }
   Serial.println("\nWiFi connected: " + WiFi.localIP().toString());
 
-  //server.on("/", HTTP_GET, [](AsyncWebServerRequest *req){
-   // req->send(LittleFS, "/chat.html", "text/html");
-  //});
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *req){
-    req->send(200, "text/plain", "ESP32 API Server is running...");
+    req->send(200, "text/html", smartHomeHTML);
   });
 
   server.on("/api/status", HTTP_GET, [](AsyncWebServerRequest *req){
@@ -193,6 +192,7 @@ void setup() {
   xTaskCreate(TaskPIRBedroom, "PIR_Bedroom", 2048, NULL, 1, NULL);
   xTaskCreate(TaskPIRBathroom, "PIR_Bathroom", 2048, NULL, 1, NULL);
   xTaskCreate(TaskACAuto, "AC_Auto", 2048, NULL, 1, NULL);
+
 }
 
 void loop() {
