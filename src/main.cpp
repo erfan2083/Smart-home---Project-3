@@ -144,18 +144,31 @@ void setup() {
   server.on("/api/light", HTTP_GET, [](AsyncWebServerRequest *req){
     if (req->hasParam("id") ){
       String id = req->getParam("id")->value();
-      Serial.println(id);
-      if (id == "bedroom-light-1-btn"){
-        Serial.println("done");
-      }
       
-      String oo = "on";
-      if (oo == "on"){
-        Serial.println("ok");
+      if (id == "bedroom-light-1-btn"){
+        bedroomLights[0] = !bedroomLights[0];
+        digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
       }
-    }
+      else if (id == "bedroom-light-2-btn") {
+        bedroomLights[1] = !bedroomLights[1];
+        digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
+      }
+      else if (id == "living-room-light-1-btn") {
+        livingLights[0] = !livingLights[0];
+        digitalWrite(LED_LIVING_1, livingLights[0]);
+      }
+      else if (id == "living-room-light-2-btn") {
+        livingLights[1] = !livingLights[1];
+        digitalWrite(LED_LIVING_1, livingLights[1]);
+      }
+      else if (id == "living-room-light-3-btn") {
+        livingLights[2] = !livingLights[2];
+        digitalWrite(LED_LIVING_1, livingLights[2]);
+      }
+    } 
+      
     
-    req->send(200, "text/plain", "done");
+    req->send(200, "text/plain", "light done");
   });
 
   // server.on("/api/control", HTTP_POST, [](AsyncWebServerRequest *req){
