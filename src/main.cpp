@@ -16,8 +16,8 @@
 
 #define LED_LIVING_1 2
 #define LED_LIVING_2 4
-#define LED_LIVING_3 23
-#define LED_BEDROOM_1 19
+#define LED_LIVING_3 8
+#define LED_BEDROOM_1 7
 #define LED_BEDROOM_2 32
 #define LED_BATHROOM 33
 #define LED_AC 27
@@ -115,25 +115,15 @@ void setup() {
   Serial.begin(115200);
 
   pinMode(PIR_LIVING, INPUT);
-  Serial.println("1");
   pinMode(PIR_BEDROOM, INPUT);
-  Serial.println("2");
   pinMode(PIR_BATHROOM, INPUT);
-  Serial.println("3");
   pinMode(LED_LIVING_1, OUTPUT);
-  Serial.println("4");
   pinMode(LED_LIVING_2, OUTPUT);
-  Serial.println("5");
   pinMode(LED_LIVING_3, OUTPUT);
-  Serial.println("6");
   pinMode(LED_BEDROOM_1, OUTPUT);
-  Serial.println("7");
   pinMode(LED_BEDROOM_2, OUTPUT);
-  Serial.println("8");
   pinMode(LED_BATHROOM, OUTPUT);
-  Serial.println("9");
   pinMode(LED_AC, OUTPUT);
-  Serial.println("10");
 
   dht.begin();
 
@@ -152,7 +142,7 @@ void setup() {
   server.on("/api/light", HTTP_GET, [](AsyncWebServerRequest *req){
     if (req->hasParam("id") ){
       String id = req->getParam("id")->value();
-      
+
       if (id == "bedroom-light-1-btn"){
         bedroomLights[0] = !bedroomLights[0];
         digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
