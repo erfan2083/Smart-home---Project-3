@@ -5,7 +5,6 @@
 #include <AsyncTCP.h>
 #include <DHT.h>
 #include <htmlPage.h>
-#include <uri/UriBraces.h>
 
 
 // ------------------------ Pin Definitions ------------------------
@@ -13,15 +12,15 @@
 #define DHTTYPE DHT22
 #define PIR_LIVING 12
 #define PIR_BEDROOM 13
-#define PIR_BATHROOM 14
+#define PIR_BATHROOM 0
 
 #define LED_LIVING_1 2
 #define LED_LIVING_2 4
-#define LED_LIVING_3 5
-#define LED_BEDROOM_1 18
-#define LED_BEDROOM_2 19
-#define LED_BATHROOM 21
-#define LED_AC 22
+#define LED_LIVING_3 23
+#define LED_BEDROOM_1 19
+#define LED_BEDROOM_2 32
+#define LED_BATHROOM 33
+#define LED_AC 27
 
 // ------------------------ Global Variables ------------------------
 const char* ssid = "Wokwi-GUEST";
@@ -116,16 +115,25 @@ void setup() {
   Serial.begin(115200);
 
   pinMode(PIR_LIVING, INPUT);
+  Serial.println("1");
   pinMode(PIR_BEDROOM, INPUT);
+  Serial.println("2");
   pinMode(PIR_BATHROOM, INPUT);
-
+  Serial.println("3");
   pinMode(LED_LIVING_1, OUTPUT);
+  Serial.println("4");
   pinMode(LED_LIVING_2, OUTPUT);
+  Serial.println("5");
   pinMode(LED_LIVING_3, OUTPUT);
+  Serial.println("6");
   pinMode(LED_BEDROOM_1, OUTPUT);
+  Serial.println("7");
   pinMode(LED_BEDROOM_2, OUTPUT);
+  Serial.println("8");
   pinMode(LED_BATHROOM, OUTPUT);
+  Serial.println("9");
   pinMode(LED_AC, OUTPUT);
+  Serial.println("10");
 
   dht.begin();
 
@@ -149,25 +157,24 @@ void setup() {
         bedroomLights[0] = !bedroomLights[0];
         digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
       }
-      else if (id == "bedroom-light-2-btn") {
+      if (id == "bedroom-light-2-btn") {
         bedroomLights[1] = !bedroomLights[1];
         digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
       }
-      else if (id == "living-room-light-1-btn") {
+      if (id == "living-room-light-1-btn") {
         livingLights[0] = !livingLights[0];
         digitalWrite(LED_LIVING_1, livingLights[0]);
       }
-      else if (id == "living-room-light-2-btn") {
+      if (id == "living-room-light-2-btn") {
         livingLights[1] = !livingLights[1];
         digitalWrite(LED_LIVING_2, livingLights[1]);
       }
-      else if (id == "living-room-light-3-btn") {
+      if (id == "living-room-light-3-btn") {
         livingLights[2] = !livingLights[2];
         digitalWrite(LED_LIVING_3, livingLights[2]);
       }
     } 
-      
-    
+
     req->send(200, "text/plain", "light done");
   });
 
