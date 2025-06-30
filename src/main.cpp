@@ -159,11 +159,11 @@ void setup() {
       }
       else if (id == "living-room-light-2-btn") {
         livingLights[1] = !livingLights[1];
-        digitalWrite(LED_LIVING_1, livingLights[1]);
+        digitalWrite(LED_LIVING_2, livingLights[1]);
       }
       else if (id == "living-room-light-3-btn") {
         livingLights[2] = !livingLights[2];
-        digitalWrite(LED_LIVING_1, livingLights[2]);
+        digitalWrite(LED_LIVING_3, livingLights[2]);
       }
     } 
       
