@@ -741,9 +741,9 @@ String smartHomeHTML = R"rawliteral(
 
         // Toggle AC function
         function toggleAC(ac, button) {
-             fetch("/api/ac/light")
+            fetch("/api/ac/light")
             .then(res => res.text())
-            
+
             if (ac.classList.contains('off')) {
                 ac.classList.remove('off');
                 ac.classList.add('on');
@@ -771,7 +771,13 @@ String smartHomeHTML = R"rawliteral(
         }
         
         // Update temperature
-        function updateTemperature(change) {
+        function updateTemperature() {
+            fetch("/api/status/temperature")
+            .then(res => res.json())
+            .then(data => {
+                var change = data.temperature
+            });
+
             let currentTemp = parseFloat(getState('temperature'));
             currentTemp = change;
             
@@ -788,7 +794,13 @@ String smartHomeHTML = R"rawliteral(
         }
         
         // Update humidity
-        function updateHumidity(change) {
+        function updateHumidity() {
+            fetch("/api/status/humidity")
+            .then(res => res.json())
+            .then(data => {
+                var change = data.humidity
+            });
+
             let currentHumidity = parseInt(getState('humidity'));
             currentHumidity = change;
             
@@ -1139,8 +1151,8 @@ String smartHomeHTML = R"rawliteral(
         simulateBathroomAutoMode();
         simulateAutoMode();
         initializeStats();
-        updateTemperature(20);
-        updateHumidity(50);
+        updateTemperature();
+        updateHumidity();
         
         // Initial page setup
         navigateTo('main-page');

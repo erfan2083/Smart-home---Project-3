@@ -766,7 +766,13 @@
         }
         
         // Update temperature
-        function updateTemperature(change) {
+        function updateTemperature() {
+            fetch("/api/status/temperature")
+            .then(res => res.json())
+            .then(data => {
+                var change = data.temperature
+            });
+            
             let currentTemp = parseFloat(getState('temperature'));
             currentTemp = change;
             
@@ -783,7 +789,13 @@
         }
         
         // Update humidity
-        function updateHumidity(change) {
+        function updateHumidity() {
+             fetch("/api/status/humidity")
+            .then(res => res.json())
+            .then(data => {
+                var change = data.humidity
+            });
+
             let currentHumidity = parseInt(getState('humidity'));
             currentHumidity = change;
             
@@ -1134,8 +1146,8 @@
         simulateBathroomAutoMode();
         simulateAutoMode();
         initializeStats();
-        updateTemperature(20);
-        updateHumidity(50);
+        updateTemperature();
+        updateHumidity();
         
         // Initial page setup
         navigateTo('main-page');

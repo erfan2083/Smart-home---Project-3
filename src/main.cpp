@@ -29,8 +29,8 @@ const char* password = "";
 AsyncWebServer server(80);
 DHT dht(DHTPIN, DHTTYPE);
 
-float temperature = 0.0;
-float humidity = 0.0;
+float temperature = 20.0;
+float humidity = 40.0;
 
 // Mode flags (manual = false, auto = true)
 bool modeLiving = false;
@@ -174,6 +174,20 @@ void setup() {
     
     req->send(200, "text/plain", "light done");
   });
+
+  server.on("/api/status/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+  String json = "{";
+  json += "\"temperature\": " + String(temperature);
+  json += "}";
+  request->send(200, "application/json", json);
+});
+
+server.on("/api/status/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+  String json = "{";
+  json += "\"humidity\": " + String(humidity);
+  json += "}";
+  request->send(200, "application/json", json);
+});
 
   // server.on("/api/control", HTTP_POST, [](AsyncWebServerRequest *req){
   //   if (req->hasParam("section", true) && req->hasParam("index", true) && req->hasParam("state", true)) {
