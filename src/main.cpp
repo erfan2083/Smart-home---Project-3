@@ -8,7 +8,7 @@
 
 
 // ------------------------ Pin Definitions ------------------------
-#define DHTPIN 15
+#define DHTPIN 21
 #define DHTTYPE DHT22
 #define PIR_LIVING 12
 #define PIR_BEDROOM 13
