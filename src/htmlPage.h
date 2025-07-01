@@ -348,7 +348,7 @@ String smartHomeHTML = R"rawliteral(
                     <div class="stat-icon text-white">
                         <i class="fas fa-temperature-high"></i>
                     </div>
-                    <div class="stat-value text-white" id="temperature-value">23.5°C</div>
+                    <div class="stat-value text-white" id="temperature-value">24.0°C</div>
                     <div class="stat-label text-white">Temperature</div>
                     <div class="w-full bg-white bg-opacity-20 h-2 rounded-full mt-4 overflow-hidden">
                         <div id="temperature-bar" class="bg-gradient-to-r from-blue-300 to-red-500 h-full rounded-full" style="width: 60%"></div>
@@ -369,7 +369,7 @@ String smartHomeHTML = R"rawliteral(
                             <circle class="bg" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="0"></circle>
                             <circle id="humidity-circle" class="progress" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="169.646"></circle>
                         </svg>
-                        <div class="value" id="humidity-value">45%</div>
+                        <div class="value" id="humidity-value">40%</div>
                     </div>
                     <div class="stat-label text-white mt-2">Humidity</div>
                 </div>
@@ -741,6 +741,9 @@ String smartHomeHTML = R"rawliteral(
 
         // Toggle AC function
         function toggleAC(ac, button) {
+             fetch("/api/ac/light")
+            .then(res => res.text())
+            
             if (ac.classList.contains('off')) {
                 ac.classList.remove('off');
                 ac.classList.add('on');

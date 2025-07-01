@@ -736,6 +736,9 @@
 
         // Toggle AC function
         function toggleAC(ac, button) {
+            fetch("/api/ac/light")
+            .then(res => res.text())
+            
             if (ac.classList.contains('off')) {
                 ac.classList.remove('off');
                 ac.classList.add('on');

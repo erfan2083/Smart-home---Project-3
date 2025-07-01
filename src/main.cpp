@@ -168,6 +168,13 @@ void setup() {
     req->send(200, "text/plain", "light done");
   });
 
+  server.on("/api/ac/light", HTTP_GET, [](AsyncWebServerRequest *req){
+    acState = !acState;
+    digitalWrite(LED_AC, acState);
+    
+    req->send(200, "text/plain", "light done");
+  });
+
   // server.on("/api/control", HTTP_POST, [](AsyncWebServerRequest *req){
   //   if (req->hasParam("section", true) && req->hasParam("index", true) && req->hasParam("state", true)) {
   //     String section = req->getParam("section", true)->value();
