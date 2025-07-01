@@ -55,7 +55,7 @@ void TaskDHT(void *param) {
     float h = dht.readHumidity();
     if (!isnan(t)) temperature = t;
     if (!isnan(h)) humidity = h;
-    vTaskDelay(3000 / portTICK_PERIOD_MS);
+    vTaskDelay(300 / portTICK_PERIOD_MS);
   }
 }
 

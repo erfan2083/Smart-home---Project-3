@@ -343,7 +343,7 @@
                     <div class="stat-icon text-white">
                         <i class="fas fa-temperature-high"></i>
                     </div>
-                    <div class="stat-value text-white" id="temperature-value">23.5°C</div>
+                    <div class="stat-value text-white" id="temperature-value">24.0°C</div>
                     <div class="stat-label text-white">Temperature</div>
                     <div class="w-full bg-white bg-opacity-20 h-2 rounded-full mt-4 overflow-hidden">
                         <div id="temperature-bar" class="bg-gradient-to-r from-blue-300 to-red-500 h-full rounded-full" style="width: 60%"></div>
@@ -364,7 +364,7 @@
                             <circle class="bg" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="0"></circle>
                             <circle id="humidity-circle" class="progress" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="169.646"></circle>
                         </svg>
-                        <div class="value" id="humidity-value">45%</div>
+                        <div class="value" id="humidity-value">40%</div>
                     </div>
                     <div class="stat-label text-white mt-2">Humidity</div>
                 </div>
@@ -770,46 +770,47 @@
             fetch("/api/status/temperature")
             .then(res => res.json())
             .then(data => {
-                var change = data.temperature
+                var change = parseFloat(data.temperature);
+            
+                let currentTemp = parseFloat(getState('temperature'));
+                currentTemp = change;
+                
+                // Keep temperature within reasonable bounds
+                if (currentTemp < -40) currentTemp = -40;
+                if (currentTemp > 80) currentTemp = 80;
+                
+                setState('temperature', currentTemp.toFixed(1));
+                temperatureValue.textContent = currentTemp.toFixed(1) + '°C';
+                
+                // Update temperature bar (16°C to 30°C range)
+                const percentage = ((currentTemp - (-40)) / (80 - (-40))) * 100;
+                temperatureBar.style.width = percentage + '%';
             });
-            
-            let currentTemp = parseFloat(getState('temperature'));
-            currentTemp = change;
-            
-            // Keep temperature within reasonable bounds
-            if (currentTemp < -40) currentTemp = -40;
-            if (currentTemp > 80) currentTemp = 80;
-            
-            setState('temperature', currentTemp.toFixed(1));
-            temperatureValue.textContent = currentTemp.toFixed(1) + '°C';
-            
-            // Update temperature bar (16°C to 30°C range)
-            const percentage = ((currentTemp - (-40)) / (80 - (-40))) * 100;
-            temperatureBar.style.width = percentage + '%';
         }
         
         // Update humidity
         function updateHumidity() {
-             fetch("/api/status/humidity")
+            fetch("/api/status/humidity")
             .then(res => res.json())
             .then(data => {
-                var change = data.humidity
-            });
+                var change = parseFloat(data.humidity);
+            
 
-            let currentHumidity = parseInt(getState('humidity'));
-            currentHumidity = change;
-            
-            // Keep humidity within bounds
-            if (currentHumidity < 0) currentHumidity = 20;
-            if (currentHumidity > 100) currentHumidity = 80;
-            
-            setState('humidity', currentHumidity);
-            humidityValue.textContent = currentHumidity + '%';
-            
-            // Update humidity circle
-            const circumference = 2 * Math.PI * 54;
-            const offset = circumference - (currentHumidity / 100) * circumference;
-            humidityCircle.style.strokeDashoffset = offset;
+                let currentHumidity = parseInt(getState('humidity'));
+                currentHumidity = change;
+                
+                // Keep humidity within bounds
+                if (currentHumidity < 0) currentHumidity = 20;
+                if (currentHumidity > 100) currentHumidity = 80;
+                
+                setState('humidity', currentHumidity);
+                humidityValue.textContent = currentHumidity + '%';
+                
+                // Update humidity circle
+                const circumference = 2 * Math.PI * 54;
+                const offset = circumference - (currentHumidity / 100) * circumference;
+                humidityCircle.style.strokeDashoffset = offset;
+            });
         }
         
         // Update energy usage

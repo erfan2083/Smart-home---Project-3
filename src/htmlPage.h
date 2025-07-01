@@ -775,22 +775,22 @@ String smartHomeHTML = R"rawliteral(
             fetch("/api/status/temperature")
             .then(res => res.json())
             .then(data => {
-                var change = data.temperature
+                var change = parseFloat(data.temperature);
+            
+                let currentTemp = parseFloat(getState('temperature'));
+                currentTemp = change;
+                
+                // Keep temperature within reasonable bounds
+                if (currentTemp < -40) currentTemp = -40;
+                if (currentTemp > 80) currentTemp = 80;
+                
+                setState('temperature', currentTemp.toFixed(1));
+                temperatureValue.textContent = currentTemp.toFixed(1) + '°C';
+                
+                // Update temperature bar (16°C to 30°C range)
+                const percentage = ((currentTemp - (-40)) / (80 - (-40))) * 100;
+                temperatureBar.style.width = percentage + '%';
             });
-
-            let currentTemp = parseFloat(getState('temperature'));
-            currentTemp = change;
-            
-            // Keep temperature within reasonable bounds
-            if (currentTemp < -40) currentTemp = -40;
-            if (currentTemp > 80) currentTemp = 80;
-            
-            setState('temperature', currentTemp.toFixed(1));
-            temperatureValue.textContent = currentTemp.toFixed(1) + '°C';
-            
-            // Update temperature bar (16°C to 30°C range)
-            const percentage = ((currentTemp - (-40)) / (80 - (-40))) * 100;
-            temperatureBar.style.width = percentage + '%';
         }
         
         // Update humidity
@@ -798,23 +798,24 @@ String smartHomeHTML = R"rawliteral(
             fetch("/api/status/humidity")
             .then(res => res.json())
             .then(data => {
-                var change = data.humidity
-            });
+                var change = parseFloat(data.humidity);
+            
 
-            let currentHumidity = parseInt(getState('humidity'));
-            currentHumidity = change;
-            
-            // Keep humidity within bounds
-            if (currentHumidity < 0) currentHumidity = 20;
-            if (currentHumidity > 100) currentHumidity = 80;
-            
-            setState('humidity', currentHumidity);
-            humidityValue.textContent = currentHumidity + '%';
-            
-            // Update humidity circle
-            const circumference = 2 * Math.PI * 54;
-            const offset = circumference - (currentHumidity / 100) * circumference;
-            humidityCircle.style.strokeDashoffset = offset;
+                let currentHumidity = parseInt(getState('humidity'));
+                currentHumidity = change;
+                
+                // Keep humidity within bounds
+                if (currentHumidity < 0) currentHumidity = 20;
+                if (currentHumidity > 100) currentHumidity = 80;
+                
+                setState('humidity', currentHumidity);
+                humidityValue.textContent = currentHumidity + '%';
+                
+                // Update humidity circle
+                const circumference = 2 * Math.PI * 54;
+                const offset = circumference - (currentHumidity / 100) * circumference;
+                humidityCircle.style.strokeDashoffset = offset;
+            });
         }
         
         // Update energy usage
@@ -1156,6 +1157,9 @@ String smartHomeHTML = R"rawliteral(
         
         // Initial page setup
         navigateTo('main-page');
+
+        setInterval(updateTemperature, 350);
+        setInterval(updateHumidity, 350);
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9502f39d141e1e5e',t:'MTc0OTk5OTc3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
