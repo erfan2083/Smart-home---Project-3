@@ -199,10 +199,10 @@ void setup() {
   });
 
   server.on("/api/auto/other", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (request->hasParam("bedRoomMode") && request->hasParam("livinRoomLightMode") && request->hasParam("livinRoomAcMode")){
-      modeBedroom = request->getParam("bedRoomMode")->value();
-      modeLiving = request->getParam("livinRoomLightMode")->value();
-      modeAC = request->getParam("livinRoomAcMode")->value();
+    if (request->hasParam("bedRoomMode") && request->hasParam("livingRoomLightMode") && request->hasParam("livingRoomAcMode")){
+      modeBedroom = request->getParam("bedRoomMode")->value().toInt();
+      modeLiving = request->getParam("livingRoomLightMode")->value().toInt();
+      modeAC = request->getParam("livingRoomAcMode")->value().toInt();
 
       String json = "{";
       json += "\"livingRoom\": " + String(pirLiving) + ",";

@@ -870,14 +870,17 @@
 
         // Simulate automatic mode for other rooms
         function simulateAutoMode() {
-            fetch("/api/auto/other?bedRoomMode=" + bedroomAuto.checked + "&"
-                 + "livinRoomLightMode=" + livingRoomLightsAuto.checked + "&"
-                 + "livinRoomAcMode=" + livingRoomACAuto.checked)
+            let bedroomOn;
+            let livingRoomOn;
+            let acOn;
+            fetch("/api/auto/other?bedRoomMode=" + (bedroomAuto.checked) + "&"
+                 + "livinRoomLightMode=" + (livingRoomLightsAuto.checked) + "&"
+                 + "livinRoomAcMode=" + (livingRoomACAuto.checked))
             .then(res => res.json())
             .then(data => {
-                const bedroomOn = bedRoom.data;
-                const livingRoomOn = livingRoom.data;
-                const acOn = ac.data;
+                bedroomOn = bedRoom.data;
+                livingRoomOn = livingRoom.data;
+                acOn = ac.data;
             });
 
 
