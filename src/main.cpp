@@ -13,6 +13,7 @@
 #define PIR_LIVING 12
 #define PIR_BEDROOM 13
 #define PIR_BATHROOM 0
+#define LDR_SENSOR 36
 
 #define LED_LIVING_1 2
 #define LED_LIVING_2 4
@@ -55,7 +56,7 @@ void TaskDHT(void *param) {
     float h = dht.readHumidity();
     if (!isnan(t)) temperature = t;
     if (!isnan(h)) humidity = h;
-    vTaskDelay(300 / portTICK_PERIOD_MS);
+    vTaskDelay(400 / portTICK_PERIOD_MS);
   }
 }
 
@@ -117,6 +118,7 @@ void setup() {
   pinMode(PIR_LIVING, INPUT);
   pinMode(PIR_BEDROOM, INPUT);
   pinMode(PIR_BATHROOM, INPUT);
+  pinMode(LDR_SENSOR, INPUT);
   pinMode(LED_LIVING_1, OUTPUT);
   pinMode(LED_LIVING_2, OUTPUT);
   pinMode(LED_LIVING_3, OUTPUT);
@@ -180,14 +182,31 @@ void setup() {
   json += "\"temperature\": " + String(temperature);
   json += "}";
   request->send(200, "application/json", json);
-});
+  });
 
-server.on("/api/status/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/api/status/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
   String json = "{";
   json += "\"humidity\": " + String(humidity);
   json += "}";
   request->send(200, "application/json", json);
-});
+  });
+
+  server.on("/api/auto/bathroom", HTTP_GET, [](AsyncWebServerRequest *request){
+  String json = "{";
+  json += "\"state\": " + String(pirBathroom);
+  json += "}";
+  request->send(200, "application/json", json);
+  });
+
+  server.on("/api/auto/other", HTTP_GET, [](AsyncWebServerRequest *request){
+  String json = "{";
+  json += "\"livingRoom\": " + String(pirBathroom) + ",";
+  json += "\"bathroom\": " + String(pirBathroom) + ",";
+  json += "\"ac\": " + String(pirBathroom) + ",";
+  json += "}";
+  request->send(200, "application/json", json);
+  });
+
 
   // server.on("/api/control", HTTP_POST, [](AsyncWebServerRequest *req){
   //   if (req->hasParam("section", true) && req->hasParam("index", true) && req->hasParam("state", true)) {

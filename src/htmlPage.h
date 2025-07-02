@@ -846,26 +846,31 @@ String smartHomeHTML = R"rawliteral(
 
         // Simulate automatic mode for bathroom
         function simulateBathroomAutoMode() {
-            // Randomly toggle bathroom light to simulate motion detection
-            const isOn = false;
-            if (isOn) {
-                bathroomLight.classList.remove('off');
-                bathroomLight.classList.add('on');
-                bathroomStatus.textContent = 'AUTO (ON)';
-                bathroomStatus.classList.remove('bg-gray-600');
-                bathroomStatus.classList.add('bg-blue-500');
-                setState('bathroom-light', 'on');
-                
+            fetch("/api/auto/bathroom")
+            .then(res => res.json())
+            .then(data => {
 
-            } else {
-                bathroomLight.classList.remove('on');
-                bathroomLight.classList.add('off');
-                bathroomStatus.textContent = 'AUTO (OFF)';
-                bathroomStatus.classList.remove('bg-blue-500');
-                bathroomStatus.classList.add('bg-gray-600');
-                setState('bathroom-light', 'off');
-                
-            }
+                const isOn = data.state;
+                if (isOn) {
+                    bathroomLight.classList.remove('off');
+                    bathroomLight.classList.add('on');
+                    bathroomStatus.textContent = 'AUTO (ON)';
+                    bathroomStatus.classList.remove('bg-gray-600');
+                    bathroomStatus.classList.add('bg-blue-500');
+                    setState('bathroom-light', 'on');
+                    
+
+                } else {
+                    bathroomLight.classList.remove('on');
+                    bathroomLight.classList.add('off');
+                    bathroomStatus.textContent = 'AUTO (OFF)';
+                    bathroomStatus.classList.remove('bg-blue-500');
+                    bathroomStatus.classList.add('bg-gray-600');
+                    setState('bathroom-light', 'off');
+                    
+
+                }
+            });
         }
 
         // Simulate automatic mode for other rooms

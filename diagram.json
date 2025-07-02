@@ -11,7 +11,13 @@
       "left": 531.8,
       "attrs": { "color": "white", "lightColor": "yellow" }
     },
-    { "type": "wokwi-led", "id": "led2", "top": 54, "left": 61.4, "attrs": { "color": "white", "lightColor": "yellow" } },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": 54,
+      "left": 61.4,
+      "attrs": { "color": "white", "lightColor": "yellow" }
+    },
     {
       "type": "wokwi-led",
       "id": "led3",
@@ -1000,7 +1006,17 @@
       "left": 99.8,
       "attrs": { "color": "cyan" }
     },
-    { "type": "wokwi-dht22", "id": "dht1", "top": -393.3, "left": 282.6, "attrs": {} }
+    { "type": "wokwi-dht22", "id": "dht1", "top": -393.3, "left": 282.6, "attrs": {} },
+    { "type": "wokwi-pir-motion-sensor", "id": "pir1", "top": -428, "left": -276.18, "attrs": {} },
+    { "type": "wokwi-pir-motion-sensor", "id": "pir2", "top": -284, "left": 530.22, "attrs": {} },
+    { "type": "wokwi-pir-motion-sensor", "id": "pir3", "top": -101.6, "left": 40.62, "attrs": {} },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "ldr1",
+      "top": -390.4,
+      "left": -133.6,
+      "attrs": {}
+    }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -1025,7 +1041,19 @@
     [ "dht1:GND", "esp:GND.2", "", [ "v19.2", "h-105.6", "v-124.8" ] ],
     [ "dht1:SDA", "esp:21", "", [ "v0" ] ],
     [ "led5:A", "esp:D0", "", [ "v192", "h768", "v-28.8" ] ],
-    [ "led1:A", "esp:D1", "", [ "v9.6", "h38.4", "v-124.8", "h-316.8", "v-96" ] ]
+    [ "led1:A", "esp:D1", "", [ "v9.6", "h38.4", "v-124.8", "h-316.8", "v-96" ] ],
+    [ "ldr1:VCC", "esp:5V", "green", [ "h19.2", "v163.2", "h9.6" ] ],
+    [ "ldr1:GND", "esp:GND.2", "green", [ "h38.4", "v-58", "h115.2" ] ],
+    [ "ldr1:DO", "esp:VP", "green", [ "h38.4", "v-0.6" ] ],
+    [ "pir1:VCC", "esp:5V", "green", [ "v0" ] ],
+    [ "pir1:GND", "esp:GND.2", "green", [ "v9.6", "h86.14", "v-96", "h326.4" ] ],
+    [ "pir1:OUT", "esp:13", "green", [ "v0" ] ],
+    [ "pir3:VCC", "esp:5V", "green", [ "v0", "h-28.8", "v-211.2" ] ],
+    [ "pir3:GND", "esp:GND.2", "green", [ "v0", "h114.94", "v-384" ] ],
+    [ "pir3:OUT", "esp:12", "green", [ "v19.2", "h-57.74", "v-278.4" ] ],
+    [ "pir2:VCC", "esp:5V", "green", [ "v0", "h-480" ] ],
+    [ "pir2:GND", "esp:GND.2", "green", [ "v105.6", "h-384.26", "v-307.2" ] ],
+    [ "pir2:OUT", "esp:0", "green", [ "v0", "h-384.14", "v-67.2" ] ]
   ],
   "dependencies": {}
 }
