@@ -841,7 +841,7 @@
 
         // Simulate automatic mode for bathroom
         function simulateBathroomAutoMode() {
-            fetch("/api/auto/bathroom")
+            await("/api/auto/bathroom")
             .then(res => res.json())
             .then(data => {
 
@@ -876,6 +876,7 @@
                 const bedroomOn = bedRoom.data;
                 const livingRoomOn = livingRoom.data;
                 const acOn = ac.data;
+            });
 
 
 
@@ -1038,7 +1039,7 @@
                 // Update room indicators
                 updateRoomIndicators();
 
-            });
+            
         }
         
         // Update room indicators on the main page

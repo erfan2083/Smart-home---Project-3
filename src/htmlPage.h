@@ -875,7 +875,7 @@ String smartHomeHTML = R"rawliteral(
 
         // Simulate automatic mode for other rooms
         function simulateAutoMode() {
-            fetch("/api/auto/other")
+            await("/api/auto/other")
             .then(res => res.json())
             .then(data => {
                 const bedroomOn = bedRoom.data;
@@ -1131,10 +1131,10 @@ String smartHomeHTML = R"rawliteral(
         livingRoomACAuto.addEventListener('change', simulateAutoMode);
 
         // Initialize bathroom auto mode
-        setInterval(simulateBathroomAutoMode, 5000);
+        setInterval(simulateBathroomAutoMode, 2000);
         
         // Initialize auto mode simulation
-        setInterval(simulateAutoMode, 8000);
+        setInterval(simulateAutoMode, 2000);
         
         // Initialize stats display
         function initializeStats() {
