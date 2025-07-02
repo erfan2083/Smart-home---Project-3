@@ -1045,45 +1045,6 @@ String smartHomeHTML = R"rawliteral(
 
             });
         }
-            
-            // Living room AC auto mode
-            if (livingRoomACAuto.checked) {
-                const acOn = false;
-                if (acOn) {
-                    livingRoomAC.classList.remove('off');
-                    livingRoomAC.classList.add('on');
-                    livingRoomACBtn.textContent = 'AUTO (ON)';
-                    livingRoomACBtn.classList.remove('bg-gray-600');
-                    livingRoomACBtn.classList.add('bg-blue-500');
-                    setState('livingroom-ac', 'on');
-                    
-             
-                } else {
-                    livingRoomAC.classList.remove('on');
-                    livingRoomAC.classList.add('off');
-                    livingRoomACBtn.textContent = 'AUTO (OFF)';
-                    livingRoomACBtn.classList.remove('bg-blue-500');
-                    livingRoomACBtn.classList.add('bg-gray-600');
-                    setState('livingroom-ac', 'off');
-                    
-                }
-                
-                livingRoomACBtn.disabled = true;
-                setState('livingroom-ac-auto', 'true');
-            } else {
-                livingRoomACBtn.disabled = false;
-                
-                if (livingRoomACBtn.textContent.includes('AUTO')) {
-                    livingRoomACBtn.textContent = livingRoomAC.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                setState('livingroom-ac-auto', 'false');
-            }
-            
-            // Update room indicators
-            updateRoomIndicators();
-            
-        }
         
         // Update room indicators on the main page
         function updateRoomIndicators() {
