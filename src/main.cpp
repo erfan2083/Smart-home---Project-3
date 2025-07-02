@@ -178,33 +178,39 @@ void setup() {
   });
 
   server.on("/api/status/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
-  String json = "{";
-  json += "\"temperature\": " + String(temperature);
-  json += "}";
-  request->send(200, "application/json", json);
+    String json = "{";
+    json += "\"temperature\": " + String(temperature);
+    json += "}";
+    request->send(200, "application/json", json);
   });
 
   server.on("/api/status/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
-  String json = "{";
-  json += "\"humidity\": " + String(humidity);
-  json += "}";
-  request->send(200, "application/json", json);
+    String json = "{";
+    json += "\"humidity\": " + String(humidity);
+    json += "}";
+    request->send(200, "application/json", json);
   });
 
   server.on("/api/auto/bathroom", HTTP_GET, [](AsyncWebServerRequest *request){
-  String json = "{";
-  json += "\"state\": " + String(pirBathroom);
-  json += "}";
-  request->send(200, "application/json", json);
+    String json = "{";
+    json += "\"state\": " + String(pirBathroom);
+    json += "}";
+    request->send(200, "application/json", json);
   });
 
   server.on("/api/auto/other", HTTP_GET, [](AsyncWebServerRequest *request){
-  String json = "{";
-  json += "\"livingRoom\": " + String(pirLiving) + ",";
-  json += "\"bedRoom\": " + String(pirBedroom) + ",";
-  json += "\"ac\": " + String(acState);
-  json += "}";
-  request->send(200, "application/json", json);
+    if (request->hasParam("bedRoomMode") && request->hasParam("livinRoomLightMode") && request->hasParam("livinRoomAcMode")){
+      modeBedroom = request->getParam("bedRoomMode")->value();
+      modeLiving = request->getParam("livinRoomLightMode")->value();
+      modeAC = request->getParam("livinRoomAcMode")->value();
+
+      String json = "{";
+      json += "\"livingRoom\": " + String(pirLiving) + ",";
+      json += "\"bedRoom\": " + String(pirBedroom) + ",";
+      json += "\"ac\": " + String(acState);
+      json += "}";
+      request->send(200, "application/json", json);
+    }
   });
 
 

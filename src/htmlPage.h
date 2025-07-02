@@ -875,7 +875,9 @@ String smartHomeHTML = R"rawliteral(
 
         // Simulate automatic mode for other rooms
         function simulateAutoMode() {
-            await("/api/auto/other")
+            fetch("/api/auto/other?bedRoomMode=" + bedroomAuto.checked + "&"
+                 + "livinRoomLightMode=" + livingRoomLightsAuto.checked + "&"
+                 + "livinRoomAcMode=" + livingRoomACAuto.checked)
             .then(res => res.json())
             .then(data => {
                 const bedroomOn = bedRoom.data;
