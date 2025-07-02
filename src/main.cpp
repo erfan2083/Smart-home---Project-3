@@ -200,9 +200,9 @@ void setup() {
 
   server.on("/api/auto/other", HTTP_GET, [](AsyncWebServerRequest *request){
   String json = "{";
-  json += "\"livingRoom\": " + String(pirBathroom) + ",";
-  json += "\"bathroom\": " + String(pirBathroom) + ",";
-  json += "\"ac\": " + String(pirBathroom) + ",";
+  json += "\"livingRoom\": " + String(pirLiving) + ",";
+  json += "\"bedRoom\": " + String(pirBedroom) + ",";
+  json += "\"ac\": " + String(acState);
   json += "}";
   request->send(200, "application/json", json);
   });

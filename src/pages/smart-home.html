@@ -870,165 +870,175 @@
 
         // Simulate automatic mode for other rooms
         function simulateAutoMode() {
-            // Bedroom auto mode
-            if (bedroomAuto.checked) {
-                const bedroomOn = false;
-                if (bedroomOn) {
-                    bedroomLight1.classList.remove('off');
-                    bedroomLight1.classList.add('on');
-                    bedroomLight1Btn.textContent = 'AUTO (ON)';
-                    bedroomLight1Btn.classList.remove('bg-gray-600');
-                    bedroomLight1Btn.classList.add('bg-yellow-500');
-                    setState('bedroom-light1', 'on');
+            fetch("/api/auto/other")
+            .then(res => res.json())
+            .then(data => {
+                const bedroomOn = bedRoom.data;
+                const livingRoomOn = livingRoom.data;
+                const acOn = ac.data;
+
+
+
+                // Bedroom auto mode
+                if (bedroomAuto.checked) {
                     
-                    bedroomLight2.classList.remove('off');
-                    bedroomLight2.classList.add('on');
-                    bedroomLight2Btn.textContent = 'AUTO (ON)';
-                    bedroomLight2Btn.classList.remove('bg-gray-600');
-                    bedroomLight2Btn.classList.add('bg-yellow-500');
-                    setState('bedroom-light2', 'on');
+                    if (bedroomOn) {
+                        bedroomLight1.classList.remove('off');
+                        bedroomLight1.classList.add('on');
+                        bedroomLight1Btn.textContent = 'AUTO (ON)';
+                        bedroomLight1Btn.classList.remove('bg-gray-600');
+                        bedroomLight1Btn.classList.add('bg-yellow-500');
+                        setState('bedroom-light1', 'on');
+                        
+                        bedroomLight2.classList.remove('off');
+                        bedroomLight2.classList.add('on');
+                        bedroomLight2Btn.textContent = 'AUTO (ON)';
+                        bedroomLight2Btn.classList.remove('bg-gray-600');
+                        bedroomLight2Btn.classList.add('bg-yellow-500');
+                        setState('bedroom-light2', 'on');
+                    } else {
+                        bedroomLight1.classList.remove('on');
+                        bedroomLight1.classList.add('off');
+                        bedroomLight1Btn.textContent = 'AUTO (OFF)';
+                        bedroomLight1Btn.classList.remove('bg-yellow-500');
+                        bedroomLight1Btn.classList.add('bg-gray-600');
+                        setState('bedroom-light1', 'off');
+                        
+                        bedroomLight2.classList.remove('on');
+                        bedroomLight2.classList.add('off');
+                        bedroomLight2Btn.textContent = 'AUTO (OFF)';
+                        bedroomLight2Btn.classList.remove('bg-yellow-500');
+                        bedroomLight2Btn.classList.add('bg-gray-600');
+                        setState('bedroom-light2', 'off');
+                    }
+                    
+                    bedroomLight1Btn.disabled = true;
+                    bedroomLight2Btn.disabled = true;
+                    setState('bedroom-auto', 'true');
                 } else {
-                    bedroomLight1.classList.remove('on');
-                    bedroomLight1.classList.add('off');
-                    bedroomLight1Btn.textContent = 'AUTO (OFF)';
-                    bedroomLight1Btn.classList.remove('bg-yellow-500');
-                    bedroomLight1Btn.classList.add('bg-gray-600');
-                    setState('bedroom-light1', 'off');
+                    bedroomLight1Btn.disabled = false;
+                    bedroomLight2Btn.disabled = false;
                     
-                    bedroomLight2.classList.remove('on');
-                    bedroomLight2.classList.add('off');
-                    bedroomLight2Btn.textContent = 'AUTO (OFF)';
-                    bedroomLight2Btn.classList.remove('bg-yellow-500');
-                    bedroomLight2Btn.classList.add('bg-gray-600');
-                    setState('bedroom-light2', 'off');
+                    if (bedroomLight1Btn.textContent.includes('AUTO')) {
+                        bedroomLight1Btn.textContent = bedroomLight1.classList.contains('on') ? 'ON' : 'OFF';
+                    }
+                    
+                    if (bedroomLight2Btn.textContent.includes('AUTO')) {
+                        bedroomLight2Btn.textContent = bedroomLight2.classList.contains('on') ? 'ON' : 'OFF';
+                    }
+                    
+                    setState('bedroom-auto', 'false');
                 }
                 
-                bedroomLight1Btn.disabled = true;
-                bedroomLight2Btn.disabled = true;
-                setState('bedroom-auto', 'true');
-            } else {
-                bedroomLight1Btn.disabled = false;
-                bedroomLight2Btn.disabled = false;
-                
-                if (bedroomLight1Btn.textContent.includes('AUTO')) {
-                    bedroomLight1Btn.textContent = bedroomLight1.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                if (bedroomLight2Btn.textContent.includes('AUTO')) {
-                    bedroomLight2Btn.textContent = bedroomLight2.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                setState('bedroom-auto', 'false');
-            }
-            
-            // Living room lights auto mode
-            if (livingRoomLightsAuto.checked) {
-                const livingRoomOn = false;
-                if (livingRoomOn) {
-                    livingRoomLight1.classList.remove('off');
-                    livingRoomLight1.classList.add('on');
-                    livingRoomLight1Btn.textContent = 'AUTO (ON)';
-                    livingRoomLight1Btn.classList.remove('bg-gray-600');
-                    livingRoomLight1Btn.classList.add('bg-yellow-500');
-                    setState('livingroom-light1', 'on');
+                // Living room lights auto mode
+                if (livingRoomLightsAuto.checked) {
                     
-                    livingRoomLight2.classList.remove('off');
-                    livingRoomLight2.classList.add('on');
-                    livingRoomLight2Btn.textContent = 'AUTO (ON)';
-                    livingRoomLight2Btn.classList.remove('bg-gray-600');
-                    livingRoomLight2Btn.classList.add('bg-yellow-500');
-                    setState('livingroom-light2', 'on');
+                    if (livingRoomOn) {
+                        livingRoomLight1.classList.remove('off');
+                        livingRoomLight1.classList.add('on');
+                        livingRoomLight1Btn.textContent = 'AUTO (ON)';
+                        livingRoomLight1Btn.classList.remove('bg-gray-600');
+                        livingRoomLight1Btn.classList.add('bg-yellow-500');
+                        setState('livingroom-light1', 'on');
+                        
+                        livingRoomLight2.classList.remove('off');
+                        livingRoomLight2.classList.add('on');
+                        livingRoomLight2Btn.textContent = 'AUTO (ON)';
+                        livingRoomLight2Btn.classList.remove('bg-gray-600');
+                        livingRoomLight2Btn.classList.add('bg-yellow-500');
+                        setState('livingroom-light2', 'on');
+                        
+                        livingRoomLight3.classList.remove('off');
+                        livingRoomLight3.classList.add('on');
+                        livingRoomLight3Btn.textContent = 'AUTO (ON)';
+                        livingRoomLight3Btn.classList.remove('bg-gray-600');
+                        livingRoomLight3Btn.classList.add('bg-yellow-500');
+                        setState('livingroom-light3', 'on');
+                    } else {
+                        livingRoomLight1.classList.remove('on');
+                        livingRoomLight1.classList.add('off');
+                        livingRoomLight1Btn.textContent = 'AUTO (OFF)';
+                        livingRoomLight1Btn.classList.remove('bg-yellow-500');
+                        livingRoomLight1Btn.classList.add('bg-gray-600');
+                        setState('livingroom-light1', 'off');
+                        
+                        livingRoomLight2.classList.remove('on');
+                        livingRoomLight2.classList.add('off');
+                        livingRoomLight2Btn.textContent = 'AUTO (OFF)';
+                        livingRoomLight2Btn.classList.remove('bg-yellow-500');
+                        livingRoomLight2Btn.classList.add('bg-gray-600');
+                        setState('livingroom-light2', 'off');
+                        
+                        livingRoomLight3.classList.remove('on');
+                        livingRoomLight3.classList.add('off');
+                        livingRoomLight3Btn.textContent = 'AUTO (OFF)';
+                        livingRoomLight3Btn.classList.remove('bg-yellow-500');
+                        livingRoomLight3Btn.classList.add('bg-gray-600');
+                        setState('livingroom-light3', 'off');
+                    }
                     
-                    livingRoomLight3.classList.remove('off');
-                    livingRoomLight3.classList.add('on');
-                    livingRoomLight3Btn.textContent = 'AUTO (ON)';
-                    livingRoomLight3Btn.classList.remove('bg-gray-600');
-                    livingRoomLight3Btn.classList.add('bg-yellow-500');
-                    setState('livingroom-light3', 'on');
+                    livingRoomLight1Btn.disabled = true;
+                    livingRoomLight2Btn.disabled = true;
+                    livingRoomLight3Btn.disabled = true;
+                    setState('livingroom-lights-auto', 'true');
                 } else {
-                    livingRoomLight1.classList.remove('on');
-                    livingRoomLight1.classList.add('off');
-                    livingRoomLight1Btn.textContent = 'AUTO (OFF)';
-                    livingRoomLight1Btn.classList.remove('bg-yellow-500');
-                    livingRoomLight1Btn.classList.add('bg-gray-600');
-                    setState('livingroom-light1', 'off');
+                    livingRoomLight1Btn.disabled = false;
+                    livingRoomLight2Btn.disabled = false;
+                    livingRoomLight3Btn.disabled = false;
                     
-                    livingRoomLight2.classList.remove('on');
-                    livingRoomLight2.classList.add('off');
-                    livingRoomLight2Btn.textContent = 'AUTO (OFF)';
-                    livingRoomLight2Btn.classList.remove('bg-yellow-500');
-                    livingRoomLight2Btn.classList.add('bg-gray-600');
-                    setState('livingroom-light2', 'off');
+                    if (livingRoomLight1Btn.textContent.includes('AUTO')) {
+                        livingRoomLight1Btn.textContent = livingRoomLight1.classList.contains('on') ? 'ON' : 'OFF';
+                    }
                     
-                    livingRoomLight3.classList.remove('on');
-                    livingRoomLight3.classList.add('off');
-                    livingRoomLight3Btn.textContent = 'AUTO (OFF)';
-                    livingRoomLight3Btn.classList.remove('bg-yellow-500');
-                    livingRoomLight3Btn.classList.add('bg-gray-600');
-                    setState('livingroom-light3', 'off');
-                }
-                
-                livingRoomLight1Btn.disabled = true;
-                livingRoomLight2Btn.disabled = true;
-                livingRoomLight3Btn.disabled = true;
-                setState('livingroom-lights-auto', 'true');
-            } else {
-                livingRoomLight1Btn.disabled = false;
-                livingRoomLight2Btn.disabled = false;
-                livingRoomLight3Btn.disabled = false;
-                
-                if (livingRoomLight1Btn.textContent.includes('AUTO')) {
-                    livingRoomLight1Btn.textContent = livingRoomLight1.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                if (livingRoomLight2Btn.textContent.includes('AUTO')) {
-                    livingRoomLight2Btn.textContent = livingRoomLight2.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                if (livingRoomLight3Btn.textContent.includes('AUTO')) {
-                    livingRoomLight3Btn.textContent = livingRoomLight3.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                setState('livingroom-lights-auto', 'false');
-            }
-            
-            // Living room AC auto mode
-            if (livingRoomACAuto.checked) {
-                const acOn = false;
-                if (acOn) {
-                    livingRoomAC.classList.remove('off');
-                    livingRoomAC.classList.add('on');
-                    livingRoomACBtn.textContent = 'AUTO (ON)';
-                    livingRoomACBtn.classList.remove('bg-gray-600');
-                    livingRoomACBtn.classList.add('bg-blue-500');
-                    setState('livingroom-ac', 'on');
+                    if (livingRoomLight2Btn.textContent.includes('AUTO')) {
+                        livingRoomLight2Btn.textContent = livingRoomLight2.classList.contains('on') ? 'ON' : 'OFF';
+                    }
                     
-             
+                    if (livingRoomLight3Btn.textContent.includes('AUTO')) {
+                        livingRoomLight3Btn.textContent = livingRoomLight3.classList.contains('on') ? 'ON' : 'OFF';
+                    }
+                    
+                    setState('livingroom-lights-auto', 'false');
+                }
+                
+                // Living room AC auto mode
+                if (livingRoomACAuto.checked) {
+                    
+                    if (acOn) {
+                        livingRoomAC.classList.remove('off');
+                        livingRoomAC.classList.add('on');
+                        livingRoomACBtn.textContent = 'AUTO (ON)';
+                        livingRoomACBtn.classList.remove('bg-gray-600');
+                        livingRoomACBtn.classList.add('bg-blue-500');
+                        setState('livingroom-ac', 'on');
+                        
+                
+                    } else {
+                        livingRoomAC.classList.remove('on');
+                        livingRoomAC.classList.add('off');
+                        livingRoomACBtn.textContent = 'AUTO (OFF)';
+                        livingRoomACBtn.classList.remove('bg-blue-500');
+                        livingRoomACBtn.classList.add('bg-gray-600');
+                        setState('livingroom-ac', 'off');
+                        
+                    }
+                    
+                    livingRoomACBtn.disabled = true;
+                    setState('livingroom-ac-auto', 'true');
                 } else {
-                    livingRoomAC.classList.remove('on');
-                    livingRoomAC.classList.add('off');
-                    livingRoomACBtn.textContent = 'AUTO (OFF)';
-                    livingRoomACBtn.classList.remove('bg-blue-500');
-                    livingRoomACBtn.classList.add('bg-gray-600');
-                    setState('livingroom-ac', 'off');
+                    livingRoomACBtn.disabled = false;
                     
+                    if (livingRoomACBtn.textContent.includes('AUTO')) {
+                        livingRoomACBtn.textContent = livingRoomAC.classList.contains('on') ? 'ON' : 'OFF';
+                    }
+                    
+                    setState('livingroom-ac-auto', 'false');
                 }
                 
-                livingRoomACBtn.disabled = true;
-                setState('livingroom-ac-auto', 'true');
-            } else {
-                livingRoomACBtn.disabled = false;
-                
-                if (livingRoomACBtn.textContent.includes('AUTO')) {
-                    livingRoomACBtn.textContent = livingRoomAC.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                setState('livingroom-ac-auto', 'false');
-            }
-            
-            // Update room indicators
-            updateRoomIndicators();
-            
+                // Update room indicators
+                updateRoomIndicators();
+
+            });
         }
         
         // Update room indicators on the main page
