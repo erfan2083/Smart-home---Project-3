@@ -713,78 +713,69 @@ const char smartHomeHTML[] PROGMEM = R"rawliteral(
         const energyBar = document.getElementById('energy-bar');
 
         // Toggle light function
-        async function toggleLight(light, button, stateKey) {
-            try{
-                const res = await fetch("/api/light?id=" + button.id);
+        function toggleLight(light, button, stateKey) {
+            fetch("/api/light?id=" + button.id)
+            .then(res => res.text())
 
-                if (light.classList.contains('off')) {
-                    light.classList.remove('off');
-                    light.classList.add('on');
-                    button.textContent = 'ON';
-                    button.classList.remove('bg-gray-600');
-                    button.classList.add('bg-yellow-500');
-                    setState(stateKey, 'on');
-                    
-                    // Increase energy usage when turning on lights
-                    updateEnergyUsage(10);
-                } else {
-                    light.classList.remove('on');
-                    light.classList.add('off');
-                    button.textContent = 'OFF';
-                    button.classList.remove('bg-yellow-500');
-                    button.classList.add('bg-gray-600');
-                    setState(stateKey, 'off');
-                    
-                    // Decrease energy usage when turning off lights
-                    updateEnergyUsage(-10);
-                }
-            }
-            catch (err) {
-                console.error(err);
+            if (light.classList.contains('off')) {
+                light.classList.remove('off');
+                light.classList.add('on');
+                button.textContent = 'ON';
+                button.classList.remove('bg-gray-600');
+                button.classList.add('bg-yellow-500');
+                setState(stateKey, 'on');
+                
+                // Increase energy usage when turning on lights
+                updateEnergyUsage(10);
+            } else {
+                light.classList.remove('on');
+                light.classList.add('off');
+                button.textContent = 'OFF';
+                button.classList.remove('bg-yellow-500');
+                button.classList.add('bg-gray-600');
+                setState(stateKey, 'off');
+                
+                // Decrease energy usage when turning off lights
+                updateEnergyUsage(-10);
             }
         }
 
         // Toggle AC function
-        async function toggleAC(ac, button) {
-            try{
-                const res = await fetch("/api/ac/light");
+        function toggleAC(ac, button) {
+            fetch("/api/ac/light")
+            .then(res => res.text())
 
-                if (ac.classList.contains('off')) {
-                    ac.classList.remove('off');
-                    ac.classList.add('on');
-                    button.textContent = 'ON';
-                    button.classList.remove('bg-gray-600');
-                    button.classList.add('bg-blue-500');
-                    setState('livingroom-ac', 'on');
-                    
-                    // Increase energy usage when turning on AC
-                    updateEnergyUsage(30);
-                    
+            if (ac.classList.contains('off')) {
+                ac.classList.remove('off');
+                ac.classList.add('on');
+                button.textContent = 'ON';
+                button.classList.remove('bg-gray-600');
+                button.classList.add('bg-blue-500');
+                setState('livingroom-ac', 'on');
+                
+                // Increase energy usage when turning on AC
+                updateEnergyUsage(30);
+                
 
-                } else {
-                    ac.classList.remove('on');
-                    ac.classList.add('off');
-                    button.textContent = 'OFF';
-                    button.classList.remove('bg-blue-500');
-                    button.classList.add('bg-gray-600');
-                    setState('livingroom-ac', 'off');
-                    
-                    // Decrease energy usage when turning off AC
-                    updateEnergyUsage(-30);
-                    
-                }
-            }
-            catch (err) {
-                console.error(err);
+            } else {
+                ac.classList.remove('on');
+                ac.classList.add('off');
+                button.textContent = 'OFF';
+                button.classList.remove('bg-blue-500');
+                button.classList.add('bg-gray-600');
+                setState('livingroom-ac', 'off');
+                
+                // Decrease energy usage when turning off AC
+                updateEnergyUsage(-30);
+                
             }
         }
         
         // Update temperature
-        async function updateTemperature() {
-            try{
-                const res = await fetch("/api/status/temperature");
-                const data = await res.json();
-            
+        function updateTemperature() {
+            fetch("/api/status/temperature")
+            .then(res => res.json())
+            .then(data => {
                 var change = parseFloat(data.temperature);
             
                 let currentTemp = parseFloat(getState('temperature'));
@@ -800,18 +791,14 @@ const char smartHomeHTML[] PROGMEM = R"rawliteral(
                 // Update temperature bar (16°C to 30°C range)
                 const percentage = ((currentTemp - (-40)) / (80 - (-40))) * 100;
                 temperatureBar.style.width = percentage + '%';
-            }
-            catch (err) {
-                console.error(err);
-            }
+            });
         }
         
         // Update humidity
-        async function updateHumidity() {
-            try{
-                const res = await fetch("/api/status/humidity");
-                const data = await res.json();
-            
+        function updateHumidity() {
+            fetch("/api/status/humidity")
+            .then(res => res.json())
+            .then(data => {
                 var change = parseFloat(data.humidity);
             
 
@@ -829,10 +816,7 @@ const char smartHomeHTML[] PROGMEM = R"rawliteral(
                 const circumference = 2 * Math.PI * 54;
                 const offset = circumference - (currentHumidity / 100) * circumference;
                 humidityCircle.style.strokeDashoffset = offset;
-            }
-            catch (err) {
-                console.error(err);
-            }
+            });
         }
         
         // Update energy usage
@@ -862,10 +846,10 @@ const char smartHomeHTML[] PROGMEM = R"rawliteral(
         }
 
         // Simulate automatic mode for bathroom
-        async function simulateBathroomAutoMode() {
-            try{
-                const res = await fetch("/api/auto/bathroom");
-                const data = await res.json();
+        function simulateBathroomAutoMode() {
+            fetch("/api/auto/bathroom")
+            .then(res => res.json())
+            .then(data => {
 
                 const isOn = data.state;
                 if (isOn) {
@@ -887,23 +871,20 @@ const char smartHomeHTML[] PROGMEM = R"rawliteral(
                     
 
                 }
-            }
-            catch (err) {
-                console.error(err);
-            }
+            });
         }
 
         // Simulate automatic mode for other rooms
-        async function simulateAutoMode() {
-            try{
-                const res = await fetch("/api/auto/other?bedRoomMode=" + (bedroomAuto.checked? 1 : 0) + "&"
-                    + "livingRoomLightMode=" + (livingRoomLightsAuto.checked? 1 : 0) + "&"
-                    + "livingRoomAcMode=" + (livingRoomACAuto.checked? 1 : 0));
-                const data = await res.json();
-        
+        function simulateAutoMode() {
+            fetch("/api/auto/other?bedRoomMode=" + (bedroomAuto.checked? 1 : 0) + "&"
+                 + "livingRoomLightMode=" + (livingRoomLightsAuto.checked? 1 : 0) + "&"
+                 + "livingRoomAcMode=" + (livingRoomACAuto.checked? 1 : 0))
+            .then(res => res.json())
+            .then(data => {
                 const livingRoomOn = data.livingRoom;
                 const bedroomOn = data.bedRoom;
                 const acOn = data.ac;
+
 
 
                 // Bedroom auto mode
@@ -1065,10 +1046,7 @@ const char smartHomeHTML[] PROGMEM = R"rawliteral(
                 // Update room indicators
                 updateRoomIndicators();
 
-            }
-            catch (err) {
-                console.error(err);
-            }
+            });
         }
         
         // Update room indicators on the main page
