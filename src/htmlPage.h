@@ -1,8 +1,9 @@
 #ifndef HTML_PAGE_H
 #define HTML_PAGE_H
-#include <Arduino.h>
+//#include <Arduino.h>
+#include <pgmspace.h>
 
-String smartHomeHTML = R"rawliteral(
+const char smartHomeHTML[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
 <head>  
@@ -782,7 +783,7 @@ String smartHomeHTML = R"rawliteral(
         async function updateTemperature() {
             try{
                 const res = await fetch("/api/status/temperature");
-                const data = res.json();
+                const data = await res.json();
             
                 var change = parseFloat(data.temperature);
             
@@ -809,7 +810,7 @@ String smartHomeHTML = R"rawliteral(
         async function updateHumidity() {
             try{
                 const res = await fetch("/api/status/humidity");
-                const data = res.json();
+                const data = await res.json();
             
                 var change = parseFloat(data.humidity);
             
@@ -864,7 +865,7 @@ String smartHomeHTML = R"rawliteral(
         async function simulateBathroomAutoMode() {
             try{
                 const res = await fetch("/api/auto/bathroom");
-                const data = res.json();
+                const data = await res.json();
 
                 const isOn = data.state;
                 if (isOn) {
@@ -898,7 +899,7 @@ String smartHomeHTML = R"rawliteral(
                 const res = await fetch("/api/auto/other?bedRoomMode=" + (bedroomAuto.checked? 1 : 0) + "&"
                     + "livingRoomLightMode=" + (livingRoomLightsAuto.checked? 1 : 0) + "&"
                     + "livingRoomAcMode=" + (livingRoomACAuto.checked? 1 : 0));
-                const data = res.json();
+                const data = await res.json();
         
                 const livingRoomOn = data.livingRoom;
                 const bedroomOn = data.bedRoom;

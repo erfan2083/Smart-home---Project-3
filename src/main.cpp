@@ -50,136 +50,6 @@ bool pirBathroom = false;
 bool bathroomLight = false;
 
 // ------------------------ RTOS Tasks ------------------------
-void TaskDHT(void *param);
-
-void TaskPIRLiving(void *param); 
-
-void TaskPIRBedroom(void *param); 
-
-void TaskPIRBathroom(void *param); 
-
-void TaskACAuto(void *param);
-
-
-// ------------------------ Setup ------------------------
-void setup() {
-  Serial.begin(115200);
-
-  pinMode(PIR_LIVING, INPUT);
-  pinMode(PIR_BEDROOM, INPUT);
-  pinMode(PIR_BATHROOM, INPUT);
-  pinMode(LDR_SENSOR, INPUT);
-  pinMode(LED_LIVING_1, OUTPUT);
-  pinMode(LED_LIVING_2, OUTPUT);
-  pinMode(LED_LIVING_3, OUTPUT);
-  pinMode(LED_BEDROOM_1, OUTPUT);
-  pinMode(LED_BEDROOM_2, OUTPUT);
-  pinMode(LED_BATHROOM, OUTPUT);
-  pinMode(LED_AC, OUTPUT);
-
-  dht.begin();
-
-  WiFi.begin(ssid, password, 6);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nWiFi connected: " + WiFi.localIP().toString());
-
-
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *req){
-    req->send(200, "text/html", smartHomeHTML);
-  });
-
-  server.on("/api/light", HTTP_GET, [](AsyncWebServerRequest *req){
-    if (req->hasParam("id") ){
-      String id = req->getParam("id")->value();
-
-      if (id == "bedroom-light-1-btn"){
-        bedroomLights[0] = !bedroomLights[0];
-        digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
-      }
-      if (id == "bedroom-light-2-btn") {
-        bedroomLights[1] = !bedroomLights[1];
-        digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
-      }
-      if (id == "living-room-light-1-btn") {
-        livingLights[0] = !livingLights[0];
-        digitalWrite(LED_LIVING_1, livingLights[0]);
-      }
-      if (id == "living-room-light-2-btn") {
-        livingLights[1] = !livingLights[1];
-        digitalWrite(LED_LIVING_2, livingLights[1]);
-      }
-      if (id == "living-room-light-3-btn") {
-        livingLights[2] = !livingLights[2];
-        digitalWrite(LED_LIVING_3, livingLights[2]);
-      }
-    } 
-
-    req->send(200, "text/plain", "light done");
-  });
-
-  server.on("/api/ac/light", HTTP_GET, [](AsyncWebServerRequest *req){
-    acState = !acState;
-    digitalWrite(LED_AC, acState);
-    
-    req->send(200, "text/plain", "ac done");
-  });
-
-  server.on("/api/status/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
-    String json = "{";
-    json += "\"temperature\": " + String(temperature);
-    json += "}";
-    request->send(200, "application/json", json);
-  });
-
-  server.on("/api/status/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
-    String json = "{";
-    json += "\"humidity\": " + String(humidity);
-    json += "}";
-    request->send(200, "application/json", json);
-  });
-
-  server.on("/api/auto/bathroom", HTTP_GET, [](AsyncWebServerRequest *request){
-    String json = "{";
-    json += "\"state\": " + String(pirBathroom);
-    json += "}";
-    request->send(200, "application/json", json);
-  });
-
-  server.on("/api/auto/other", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (request->hasParam("bedRoomMode") && request->hasParam("livingRoomLightMode") && request->hasParam("livingRoomAcMode")){
-      modeBedroom = request->getParam("bedRoomMode")->value().toInt();
-      modeLiving = request->getParam("livingRoomLightMode")->value().toInt();
-      modeAC = request->getParam("livingRoomAcMode")->value().toInt();
-
-      String json = "{";
-      json += "\"livingRoom\": " + String(pirLiving) + ",";
-      json += "\"bedRoom\": " + String(pirBedroom) + ",";
-      json += "\"ac\": " + String(acState);
-      json += "}";
-      request->send(200, "application/json", json);
-    }
-  });
-
-  server.begin();
-
-
-  xTaskCreate(TaskDHT, "DHT", 2048, NULL, 1, NULL);
-  xTaskCreate(TaskPIRLiving, "PIR_Living", 2048, NULL, 1, NULL);
-  xTaskCreate(TaskPIRBedroom, "PIR_Bedroom", 2048, NULL, 1, NULL);
-  xTaskCreate(TaskPIRBathroom, "PIR_Bathroom", 2048, NULL, 1, NULL);
-  xTaskCreate(TaskACAuto, "AC_Auto", 2048, NULL, 1, NULL);
-  
-  //vTaskStartScheduler();
-}
-
-void loop() {
-  // Everything is RTOS-based
-}
-
-
 void TaskDHT(void *param) {
   while (true) {
     float t = dht.readTemperature();
@@ -240,3 +110,193 @@ void TaskACAuto(void *param) {
     vTaskDelay(1050 / portTICK_PERIOD_MS);
   }
 }
+
+// ------------------------ Setup ------------------------
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(PIR_LIVING, INPUT);
+  pinMode(PIR_BEDROOM, INPUT);
+  pinMode(PIR_BATHROOM, INPUT);
+  pinMode(LDR_SENSOR, INPUT);
+  pinMode(LED_LIVING_1, OUTPUT);
+  pinMode(LED_LIVING_2, OUTPUT);
+  pinMode(LED_LIVING_3, OUTPUT);
+  pinMode(LED_BEDROOM_1, OUTPUT);
+  pinMode(LED_BEDROOM_2, OUTPUT);
+  pinMode(LED_BATHROOM, OUTPUT);
+  pinMode(LED_AC, OUTPUT);
+
+  dht.begin();
+
+  WiFi.begin(ssid, password, 6);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected: " + WiFi.localIP().toString());
+
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *req){
+    req->send_P(200, "text/html", smartHomeHTML);
+  });
+
+  server.on("/api/light", HTTP_GET, [](AsyncWebServerRequest *req){
+    if (req->hasParam("id") ){
+      String id = req->getParam("id")->value();
+
+      if (id == "bedroom-light-1-btn"){
+        bedroomLights[0] = !bedroomLights[0];
+        digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
+      }
+      if (id == "bedroom-light-2-btn") {
+        bedroomLights[1] = !bedroomLights[1];
+        digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
+      }
+      if (id == "living-room-light-1-btn") {
+        livingLights[0] = !livingLights[0];
+        digitalWrite(LED_LIVING_1, livingLights[0]);
+      }
+      if (id == "living-room-light-2-btn") {
+        livingLights[1] = !livingLights[1];
+        digitalWrite(LED_LIVING_2, livingLights[1]);
+      }
+      if (id == "living-room-light-3-btn") {
+        livingLights[2] = !livingLights[2];
+        digitalWrite(LED_LIVING_3, livingLights[2]);
+      }
+
+    }
+    else {
+      Serial.println("no light params");
+      req->send(400, "text/plain", "missing light params");
+    } 
+
+    req->send(200, "text/plain", "light done");
+  });
+
+  server.on("/api/ac/light", HTTP_GET, [](AsyncWebServerRequest *req){
+    acState = !acState;
+    digitalWrite(LED_AC, acState);
+    
+    req->send(200, "text/plain", "ac done");
+  });
+
+  server.on("/api/status/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+    String json = "{";
+    json += "\"temperature\": " + String(temperature);
+    json += "}";
+    request->send(200, "application/json", json);
+  });
+
+  server.on("/api/status/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+    String json = "{";
+    json += "\"humidity\": " + String(humidity);
+    json += "}";
+    request->send(200, "application/json", json);
+  });
+
+  server.on("/api/auto/bathroom", HTTP_GET, [](AsyncWebServerRequest *request){
+    String json = "{";
+    json += "\"state\": " + String(pirBathroom);
+    json += "}";
+    request->send(200, "application/json", json);
+  });
+
+  server.on("/api/auto/other", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->hasParam("bedRoomMode") && request->hasParam("livingRoomLightMode") && request->hasParam("livingRoomAcMode")){
+      modeBedroom = request->getParam("bedRoomMode")->value().toInt();
+      modeLiving = request->getParam("livingRoomLightMode")->value().toInt();
+      modeAC = request->getParam("livingRoomAcMode")->value().toInt();
+
+      String json = "{";
+      json += "\"livingRoom\": " + String(pirLiving) + ",";
+      json += "\"bedRoom\": " + String(pirBedroom) + ",";
+      json += "\"ac\": " + String(acState);
+      json += "}";
+      request->send(200, "application/json", json);
+    }
+    else {
+      Serial.println("no auto params");
+      request->send(400, "text/plain", "missing auto light params");
+    } 
+  });
+
+  server.begin();
+
+
+  xTaskCreate(TaskDHT, "DHT", 2048, NULL, 1, NULL);
+  xTaskCreate(TaskPIRLiving, "PIR_Living", 2048, NULL, 1, NULL);
+  xTaskCreate(TaskPIRBedroom, "PIR_Bedroom", 2048, NULL, 1, NULL);
+  xTaskCreate(TaskPIRBathroom, "PIR_Bathroom", 2048, NULL, 1, NULL);
+  xTaskCreate(TaskACAuto, "AC_Auto", 2048, NULL, 1, NULL);
+  
+  //vTaskStartScheduler();
+}
+
+void loop() {
+  // Everything is RTOS-based
+}
+
+
+// void TaskDHT(void *param) {
+//   Serial.print('1');
+//   while (true) {
+//     float t = dht.readTemperature();
+//     float h = dht.readHumidity();
+//     if (!isnan(t)) temperature = t;
+//     if (!isnan(h)) humidity = h;
+//     vTaskDelay(400 / portTICK_PERIOD_MS);
+//   }
+// }
+
+// void TaskPIRLiving(void *param) {
+//   while (true) {
+//     pirLiving = digitalRead(PIR_LIVING);
+//     if (modeLiving) {
+//       digitalWrite(LED_LIVING_1, pirLiving);
+//       digitalWrite(LED_LIVING_2, pirLiving);
+//       digitalWrite(LED_LIVING_3, pirLiving);
+//     } else {
+//       digitalWrite(LED_LIVING_1, livingLights[0]);
+//       digitalWrite(LED_LIVING_2, livingLights[1]);
+//       digitalWrite(LED_LIVING_3, livingLights[2]);
+//     }
+//     vTaskDelay(100 / portTICK_PERIOD_MS);
+//   }
+// }
+
+// void TaskPIRBedroom(void *param) {
+//   while (true) {
+//     pirBedroom = digitalRead(PIR_BEDROOM);
+//     if (modeBedroom) {
+//       digitalWrite(LED_BEDROOM_1, pirBedroom);
+//       digitalWrite(LED_BEDROOM_2, pirBedroom);
+//       Serial.println("LED are on");
+//     } else {
+//       digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
+//       digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
+//     }
+//     vTaskDelay(300 / portTICK_PERIOD_MS);
+//   }
+// }
+
+// void TaskPIRBathroom(void *param) {
+//   while (true) {
+//     pirBathroom = digitalRead(PIR_BATHROOM);
+//     bathroomLight = pirBathroom;
+//     digitalWrite(LED_BATHROOM, bathroomLight);
+//     vTaskDelay(500 / portTICK_PERIOD_MS);
+//   }
+// }
+
+// void TaskACAuto(void *param) {
+//   while (true) {
+//     if (modeAC) {
+//       if (temperature >= 27) acState = true;
+//       else if (temperature <= 22) acState = false;
+//     }
+//     digitalWrite(LED_AC, acState);
+//     vTaskDelay(1050 / portTICK_PERIOD_MS);
+//   }
+// }
