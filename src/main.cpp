@@ -124,7 +124,7 @@ void setup() {
     acState = !acState;
     digitalWrite(LED_AC, acState);
     
-    req->send(200, "text/plain", "light done");
+    req->send(200, "text/plain", "ac done");
   });
 
   server.on("/api/status/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -172,7 +172,7 @@ void setup() {
   xTaskCreate(TaskPIRBathroom, "PIR_Bathroom", 2048, NULL, 1, NULL);
   xTaskCreate(TaskACAuto, "AC_Auto", 2048, NULL, 1, NULL);
   
-  vTaskStartScheduler();
+  //vTaskStartScheduler();
 }
 
 void loop() {
