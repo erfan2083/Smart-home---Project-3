@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EFN Smart House</title>
@@ -343,14 +343,14 @@
                     <div class="stat-icon text-white">
                         <i class="fas fa-temperature-high"></i>
                     </div>
-                    <div class="stat-value text-white" id="temperature-value">23.5°C</div>
+                    <div class="stat-value text-white" id="temperature-value">24.0°C</div>
                     <div class="stat-label text-white">Temperature</div>
                     <div class="w-full bg-white bg-opacity-20 h-2 rounded-full mt-4 overflow-hidden">
                         <div id="temperature-bar" class="bg-gradient-to-r from-blue-300 to-red-500 h-full rounded-full" style="width: 60%"></div>
                     </div>
                     <div class="flex justify-between w-full mt-2 text-xs text-white">
-                        <span>16°C</span>
-                        <span>30°C</span>
+                        <span>-40°C</span>
+                        <span>80°C</span>
                     </div>
                 </div>
                 
@@ -364,7 +364,7 @@
                             <circle class="bg" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="0"></circle>
                             <circle id="humidity-circle" class="progress" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="169.646"></circle>
                         </svg>
-                        <div class="value" id="humidity-value">45%</div>
+                        <div class="value" id="humidity-value">40%</div>
                     </div>
                     <div class="stat-label text-white mt-2">Humidity</div>
                 </div>
@@ -707,94 +707,126 @@
         const energyBar = document.getElementById('energy-bar');
 
         // Toggle light function
-        function toggleLight(light, button, stateKey) {
-            if (light.classList.contains('off')) {
-                light.classList.remove('off');
-                light.classList.add('on');
-                button.textContent = 'ON';
-                button.classList.remove('bg-gray-600');
-                button.classList.add('bg-yellow-500');
-                setState(stateKey, 'on');
-                
-                // Increase energy usage when turning on lights
-                updateEnergyUsage(10);
-            } else {
-                light.classList.remove('on');
-                light.classList.add('off');
-                button.textContent = 'OFF';
-                button.classList.remove('bg-yellow-500');
-                button.classList.add('bg-gray-600');
-                setState(stateKey, 'off');
-                
-                // Decrease energy usage when turning off lights
-                updateEnergyUsage(-10);
+        async function toggleLight(light, button, stateKey) {
+            try{
+                const res = await fetch("/api/light?id=" + button.id);
+
+                if (light.classList.contains('off')) {
+                    light.classList.remove('off');
+                    light.classList.add('on');
+                    button.textContent = 'ON';
+                    button.classList.remove('bg-gray-600');
+                    button.classList.add('bg-yellow-500');
+                    setState(stateKey, 'on');
+                    
+                    // Increase energy usage when turning on lights
+                    updateEnergyUsage(10);
+                } else {
+                    light.classList.remove('on');
+                    light.classList.add('off');
+                    button.textContent = 'OFF';
+                    button.classList.remove('bg-yellow-500');
+                    button.classList.add('bg-gray-600');
+                    setState(stateKey, 'off');
+                    
+                    // Decrease energy usage when turning off lights
+                    updateEnergyUsage(-10);
+                }
+            }
+            catch (err) {
+                console.error(err);
             }
         }
 
         // Toggle AC function
-        function toggleAC(ac, button) {
-            if (ac.classList.contains('off')) {
-                ac.classList.remove('off');
-                ac.classList.add('on');
-                button.textContent = 'ON';
-                button.classList.remove('bg-gray-600');
-                button.classList.add('bg-blue-500');
-                setState('livingroom-ac', 'on');
-                
-                // Increase energy usage when turning on AC
-                updateEnergyUsage(30);
-                
-                // AC affects temperature
-                updateTemperature(-1.5);
-            } else {
-                ac.classList.remove('on');
-                ac.classList.add('off');
-                button.textContent = 'OFF';
-                button.classList.remove('bg-blue-500');
-                button.classList.add('bg-gray-600');
-                setState('livingroom-ac', 'off');
-                
-                // Decrease energy usage when turning off AC
-                updateEnergyUsage(-30);
-                
-                // Temperature rises when AC is off
-                updateTemperature(1.5);
+        async function toggleAC(ac, button) {
+            try{
+                const res = await fetch("/api/ac/light");
+
+                if (ac.classList.contains('off')) {
+                    ac.classList.remove('off');
+                    ac.classList.add('on');
+                    button.textContent = 'ON';
+                    button.classList.remove('bg-gray-600');
+                    button.classList.add('bg-blue-500');
+                    setState('livingroom-ac', 'on');
+                    
+                    // Increase energy usage when turning on AC
+                    updateEnergyUsage(30);
+                    
+
+                } else {
+                    ac.classList.remove('on');
+                    ac.classList.add('off');
+                    button.textContent = 'OFF';
+                    button.classList.remove('bg-blue-500');
+                    button.classList.add('bg-gray-600');
+                    setState('livingroom-ac', 'off');
+                    
+                    // Decrease energy usage when turning off AC
+                    updateEnergyUsage(-30);
+                    
+                }
+            }
+            catch (err) {
+                console.error(err);
             }
         }
         
         // Update temperature
-        function updateTemperature(change) {
-            let currentTemp = parseFloat(getState('temperature'));
-            currentTemp += change;
+        async function updateTemperature() {
+            try{
+                const res = await fetch("/api/status/temperature");
+                const data = res.json();
             
-            // Keep temperature within reasonable bounds
-            if (currentTemp < 16) currentTemp = 16;
-            if (currentTemp > 30) currentTemp = 30;
+                var change = parseFloat(data.temperature);
             
-            setState('temperature', currentTemp.toFixed(1));
-            temperatureValue.textContent = currentTemp.toFixed(1) + '°C';
-            
-            // Update temperature bar (16°C to 30°C range)
-            const percentage = ((currentTemp - 16) / (30 - 16)) * 100;
-            temperatureBar.style.width = percentage + '%';
+                let currentTemp = parseFloat(getState('temperature'));
+                currentTemp = change;
+                
+                // Keep temperature within reasonable bounds
+                if (currentTemp < -40) currentTemp = -40;
+                if (currentTemp > 80) currentTemp = 80;
+                
+                setState('temperature', currentTemp.toFixed(1));
+                temperatureValue.textContent = currentTemp.toFixed(1) + '°C';
+                
+                // Update temperature bar (16°C to 30°C range)
+                const percentage = ((currentTemp - (-40)) / (80 - (-40))) * 100;
+                temperatureBar.style.width = percentage + '%';
+            }
+            catch (err) {
+                console.error(err);
+            }
         }
         
         // Update humidity
-        function updateHumidity(change) {
-            let currentHumidity = parseInt(getState('humidity'));
-            currentHumidity += change;
+        async function updateHumidity() {
+            try{
+                const res = await fetch("/api/status/humidity");
+                const data = res.json();
             
-            // Keep humidity within bounds
-            if (currentHumidity < 20) currentHumidity = 20;
-            if (currentHumidity > 80) currentHumidity = 80;
+                var change = parseFloat(data.humidity);
             
-            setState('humidity', currentHumidity);
-            humidityValue.textContent = currentHumidity + '%';
-            
-            // Update humidity circle
-            const circumference = 2 * Math.PI * 54;
-            const offset = circumference - (currentHumidity / 100) * circumference;
-            humidityCircle.style.strokeDashoffset = offset;
+
+                let currentHumidity = parseInt(getState('humidity'));
+                currentHumidity = change;
+                
+                // Keep humidity within bounds
+                if (currentHumidity < 0) currentHumidity = 20;
+                if (currentHumidity > 100) currentHumidity = 80;
+                
+                setState('humidity', currentHumidity);
+                humidityValue.textContent = currentHumidity + '%';
+                
+                // Update humidity circle
+                const circumference = 2 * Math.PI * 54;
+                const offset = circumference - (currentHumidity / 100) * circumference;
+                humidityCircle.style.strokeDashoffset = offset;
+            }
+            catch (err) {
+                console.error(err);
+            }
         }
         
         // Update energy usage
@@ -824,205 +856,212 @@
         }
 
         // Simulate automatic mode for bathroom
-        function simulateBathroomAutoMode() {
-            // Randomly toggle bathroom light to simulate motion detection
-            const isOn = Math.random() > 0.5;
-            if (isOn) {
-                bathroomLight.classList.remove('off');
-                bathroomLight.classList.add('on');
-                bathroomStatus.textContent = 'AUTO (ON)';
-                bathroomStatus.classList.remove('bg-gray-600');
-                bathroomStatus.classList.add('bg-blue-500');
-                setState('bathroom-light', 'on');
-                
-                // Bathroom usage affects humidity
-                updateHumidity(5);
-            } else {
-                bathroomLight.classList.remove('on');
-                bathroomLight.classList.add('off');
-                bathroomStatus.textContent = 'AUTO (OFF)';
-                bathroomStatus.classList.remove('bg-blue-500');
-                bathroomStatus.classList.add('bg-gray-600');
-                setState('bathroom-light', 'off');
-                
-                // Humidity decreases when bathroom not in use
-                updateHumidity(-3);
+        async function simulateBathroomAutoMode() {
+            try{
+                const res = await fetch("/api/auto/bathroom");
+                const data = res.json();
+
+                const isOn = data.state;
+                if (isOn) {
+                    bathroomLight.classList.remove('off');
+                    bathroomLight.classList.add('on');
+                    bathroomStatus.textContent = 'AUTO (ON)';
+                    bathroomStatus.classList.remove('bg-gray-600');
+                    bathroomStatus.classList.add('bg-blue-500');
+                    setState('bathroom-light', 'on');
+                    
+
+                } else {
+                    bathroomLight.classList.remove('on');
+                    bathroomLight.classList.add('off');
+                    bathroomStatus.textContent = 'AUTO (OFF)';
+                    bathroomStatus.classList.remove('bg-blue-500');
+                    bathroomStatus.classList.add('bg-gray-600');
+                    setState('bathroom-light', 'off');
+                    
+
+                }
+            }
+            catch (err) {
+                console.error(err);
             }
         }
 
         // Simulate automatic mode for other rooms
-        function simulateAutoMode() {
-            // Bedroom auto mode
-            if (bedroomAuto.checked) {
-                const bedroomOn = Math.random() > 0.5;
-                if (bedroomOn) {
-                    bedroomLight1.classList.remove('off');
-                    bedroomLight1.classList.add('on');
-                    bedroomLight1Btn.textContent = 'AUTO (ON)';
-                    bedroomLight1Btn.classList.remove('bg-gray-600');
-                    bedroomLight1Btn.classList.add('bg-yellow-500');
-                    setState('bedroom-light1', 'on');
+        async function simulateAutoMode() {
+            try{
+                const res = await fetch("/api/auto/other?bedRoomMode=" + (bedroomAuto.checked? 1 : 0) + "&"
+                    + "livingRoomLightMode=" + (livingRoomLightsAuto.checked? 1 : 0) + "&"
+                    + "livingRoomAcMode=" + (livingRoomACAuto.checked? 1 : 0));
+                const data = res.json();
+        
+                const livingRoomOn = data.livingRoom;
+                const bedroomOn = data.bedRoom;
+                const acOn = data.ac;
+
+
+                // Bedroom auto mode
+                if (bedroomAuto.checked) {
                     
-                    bedroomLight2.classList.remove('off');
-                    bedroomLight2.classList.add('on');
-                    bedroomLight2Btn.textContent = 'AUTO (ON)';
-                    bedroomLight2Btn.classList.remove('bg-gray-600');
-                    bedroomLight2Btn.classList.add('bg-yellow-500');
-                    setState('bedroom-light2', 'on');
+                    if (bedroomOn) {
+                        bedroomLight1.classList.remove('off');
+                        bedroomLight1.classList.add('on');
+                        bedroomLight1Btn.textContent = 'AUTO (ON)';
+                        bedroomLight1Btn.classList.remove('bg-gray-600');
+                        bedroomLight1Btn.classList.add('bg-yellow-500');
+                        setState('bedroom-light1', 'on');
+                        
+                        bedroomLight2.classList.remove('off');
+                        bedroomLight2.classList.add('on');
+                        bedroomLight2Btn.textContent = 'AUTO (ON)';
+                        bedroomLight2Btn.classList.remove('bg-gray-600');
+                        bedroomLight2Btn.classList.add('bg-yellow-500');
+                        setState('bedroom-light2', 'on');
+                    } else {
+                        bedroomLight1.classList.remove('on');
+                        bedroomLight1.classList.add('off');
+                        bedroomLight1Btn.textContent = 'AUTO (OFF)';
+                        bedroomLight1Btn.classList.remove('bg-yellow-500');
+                        bedroomLight1Btn.classList.add('bg-gray-600');
+                        setState('bedroom-light1', 'off');
+                        
+                        bedroomLight2.classList.remove('on');
+                        bedroomLight2.classList.add('off');
+                        bedroomLight2Btn.textContent = 'AUTO (OFF)';
+                        bedroomLight2Btn.classList.remove('bg-yellow-500');
+                        bedroomLight2Btn.classList.add('bg-gray-600');
+                        setState('bedroom-light2', 'off');
+                    }
+                    
+                    bedroomLight1Btn.disabled = true;
+                    bedroomLight2Btn.disabled = true;
+                    setState('bedroom-auto', 'true');
                 } else {
-                    bedroomLight1.classList.remove('on');
-                    bedroomLight1.classList.add('off');
-                    bedroomLight1Btn.textContent = 'AUTO (OFF)';
-                    bedroomLight1Btn.classList.remove('bg-yellow-500');
-                    bedroomLight1Btn.classList.add('bg-gray-600');
-                    setState('bedroom-light1', 'off');
+                    bedroomLight1Btn.disabled = false;
+                    bedroomLight2Btn.disabled = false;
                     
-                    bedroomLight2.classList.remove('on');
-                    bedroomLight2.classList.add('off');
-                    bedroomLight2Btn.textContent = 'AUTO (OFF)';
-                    bedroomLight2Btn.classList.remove('bg-yellow-500');
-                    bedroomLight2Btn.classList.add('bg-gray-600');
-                    setState('bedroom-light2', 'off');
+                    if (bedroomLight1Btn.textContent.includes('AUTO')) {
+                        bedroomLight1Btn.textContent = bedroomLight1.classList.contains('on') ? 'ON' : 'OFF';
+                    }
+                    
+                    if (bedroomLight2Btn.textContent.includes('AUTO')) {
+                        bedroomLight2Btn.textContent = bedroomLight2.classList.contains('on') ? 'ON' : 'OFF';
+                    }
+                    
+                    setState('bedroom-auto', 'false');
                 }
                 
-                bedroomLight1Btn.disabled = true;
-                bedroomLight2Btn.disabled = true;
-                setState('bedroom-auto', 'true');
-            } else {
-                bedroomLight1Btn.disabled = false;
-                bedroomLight2Btn.disabled = false;
-                
-                if (bedroomLight1Btn.textContent.includes('AUTO')) {
-                    bedroomLight1Btn.textContent = bedroomLight1.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                if (bedroomLight2Btn.textContent.includes('AUTO')) {
-                    bedroomLight2Btn.textContent = bedroomLight2.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                setState('bedroom-auto', 'false');
-            }
-            
-            // Living room lights auto mode
-            if (livingRoomLightsAuto.checked) {
-                const livingRoomOn = Math.random() > 0.4;
-                if (livingRoomOn) {
-                    livingRoomLight1.classList.remove('off');
-                    livingRoomLight1.classList.add('on');
-                    livingRoomLight1Btn.textContent = 'AUTO (ON)';
-                    livingRoomLight1Btn.classList.remove('bg-gray-600');
-                    livingRoomLight1Btn.classList.add('bg-yellow-500');
-                    setState('livingroom-light1', 'on');
+                // Living room lights auto mode
+                if (livingRoomLightsAuto.checked) {
                     
-                    livingRoomLight2.classList.remove('off');
-                    livingRoomLight2.classList.add('on');
-                    livingRoomLight2Btn.textContent = 'AUTO (ON)';
-                    livingRoomLight2Btn.classList.remove('bg-gray-600');
-                    livingRoomLight2Btn.classList.add('bg-yellow-500');
-                    setState('livingroom-light2', 'on');
+                    if (livingRoomOn) {
+                        livingRoomLight1.classList.remove('off');
+                        livingRoomLight1.classList.add('on');
+                        livingRoomLight1Btn.textContent = 'AUTO (ON)';
+                        livingRoomLight1Btn.classList.remove('bg-gray-600');
+                        livingRoomLight1Btn.classList.add('bg-yellow-500');
+                        setState('livingroom-light1', 'on');
+                        
+                        livingRoomLight2.classList.remove('off');
+                        livingRoomLight2.classList.add('on');
+                        livingRoomLight2Btn.textContent = 'AUTO (ON)';
+                        livingRoomLight2Btn.classList.remove('bg-gray-600');
+                        livingRoomLight2Btn.classList.add('bg-yellow-500');
+                        setState('livingroom-light2', 'on');
+                        
+                        livingRoomLight3.classList.remove('off');
+                        livingRoomLight3.classList.add('on');
+                        livingRoomLight3Btn.textContent = 'AUTO (ON)';
+                        livingRoomLight3Btn.classList.remove('bg-gray-600');
+                        livingRoomLight3Btn.classList.add('bg-yellow-500');
+                        setState('livingroom-light3', 'on');
+                    } else {
+                        livingRoomLight1.classList.remove('on');
+                        livingRoomLight1.classList.add('off');
+                        livingRoomLight1Btn.textContent = 'AUTO (OFF)';
+                        livingRoomLight1Btn.classList.remove('bg-yellow-500');
+                        livingRoomLight1Btn.classList.add('bg-gray-600');
+                        setState('livingroom-light1', 'off');
+                        
+                        livingRoomLight2.classList.remove('on');
+                        livingRoomLight2.classList.add('off');
+                        livingRoomLight2Btn.textContent = 'AUTO (OFF)';
+                        livingRoomLight2Btn.classList.remove('bg-yellow-500');
+                        livingRoomLight2Btn.classList.add('bg-gray-600');
+                        setState('livingroom-light2', 'off');
+                        
+                        livingRoomLight3.classList.remove('on');
+                        livingRoomLight3.classList.add('off');
+                        livingRoomLight3Btn.textContent = 'AUTO (OFF)';
+                        livingRoomLight3Btn.classList.remove('bg-yellow-500');
+                        livingRoomLight3Btn.classList.add('bg-gray-600');
+                        setState('livingroom-light3', 'off');
+                    }
                     
-                    livingRoomLight3.classList.remove('off');
-                    livingRoomLight3.classList.add('on');
-                    livingRoomLight3Btn.textContent = 'AUTO (ON)';
-                    livingRoomLight3Btn.classList.remove('bg-gray-600');
-                    livingRoomLight3Btn.classList.add('bg-yellow-500');
-                    setState('livingroom-light3', 'on');
+                    livingRoomLight1Btn.disabled = true;
+                    livingRoomLight2Btn.disabled = true;
+                    livingRoomLight3Btn.disabled = true;
+                    setState('livingroom-lights-auto', 'true');
                 } else {
-                    livingRoomLight1.classList.remove('on');
-                    livingRoomLight1.classList.add('off');
-                    livingRoomLight1Btn.textContent = 'AUTO (OFF)';
-                    livingRoomLight1Btn.classList.remove('bg-yellow-500');
-                    livingRoomLight1Btn.classList.add('bg-gray-600');
-                    setState('livingroom-light1', 'off');
+                    livingRoomLight1Btn.disabled = false;
+                    livingRoomLight2Btn.disabled = false;
+                    livingRoomLight3Btn.disabled = false;
                     
-                    livingRoomLight2.classList.remove('on');
-                    livingRoomLight2.classList.add('off');
-                    livingRoomLight2Btn.textContent = 'AUTO (OFF)';
-                    livingRoomLight2Btn.classList.remove('bg-yellow-500');
-                    livingRoomLight2Btn.classList.add('bg-gray-600');
-                    setState('livingroom-light2', 'off');
+                    if (livingRoomLight1Btn.textContent.includes('AUTO')) {
+                        livingRoomLight1Btn.textContent = livingRoomLight1.classList.contains('on') ? 'ON' : 'OFF';
+                    }
                     
-                    livingRoomLight3.classList.remove('on');
-                    livingRoomLight3.classList.add('off');
-                    livingRoomLight3Btn.textContent = 'AUTO (OFF)';
-                    livingRoomLight3Btn.classList.remove('bg-yellow-500');
-                    livingRoomLight3Btn.classList.add('bg-gray-600');
-                    setState('livingroom-light3', 'off');
-                }
-                
-                livingRoomLight1Btn.disabled = true;
-                livingRoomLight2Btn.disabled = true;
-                livingRoomLight3Btn.disabled = true;
-                setState('livingroom-lights-auto', 'true');
-            } else {
-                livingRoomLight1Btn.disabled = false;
-                livingRoomLight2Btn.disabled = false;
-                livingRoomLight3Btn.disabled = false;
-                
-                if (livingRoomLight1Btn.textContent.includes('AUTO')) {
-                    livingRoomLight1Btn.textContent = livingRoomLight1.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                if (livingRoomLight2Btn.textContent.includes('AUTO')) {
-                    livingRoomLight2Btn.textContent = livingRoomLight2.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                if (livingRoomLight3Btn.textContent.includes('AUTO')) {
-                    livingRoomLight3Btn.textContent = livingRoomLight3.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                setState('livingroom-lights-auto', 'false');
-            }
-            
-            // Living room AC auto mode
-            if (livingRoomACAuto.checked) {
-                const acOn = Math.random() > 0.6;
-                if (acOn) {
-                    livingRoomAC.classList.remove('off');
-                    livingRoomAC.classList.add('on');
-                    livingRoomACBtn.textContent = 'AUTO (ON)';
-                    livingRoomACBtn.classList.remove('bg-gray-600');
-                    livingRoomACBtn.classList.add('bg-blue-500');
-                    setState('livingroom-ac', 'on');
+                    if (livingRoomLight2Btn.textContent.includes('AUTO')) {
+                        livingRoomLight2Btn.textContent = livingRoomLight2.classList.contains('on') ? 'ON' : 'OFF';
+                    }
                     
-                    // AC affects temperature and humidity
-                    updateTemperature(-0.5);
-                    updateHumidity(-2);
+                    if (livingRoomLight3Btn.textContent.includes('AUTO')) {
+                        livingRoomLight3Btn.textContent = livingRoomLight3.classList.contains('on') ? 'ON' : 'OFF';
+                    }
+                    
+                    setState('livingroom-lights-auto', 'false');
+                }
+                
+                // Living room AC auto mode
+                if (livingRoomACAuto.checked) {
+                    
+                    if (acOn) {
+                        livingRoomAC.classList.remove('off');
+                        livingRoomAC.classList.add('on');
+                        livingRoomACBtn.textContent = 'AUTO (ON)';
+                        livingRoomACBtn.classList.remove('bg-gray-600');
+                        livingRoomACBtn.classList.add('bg-blue-500');
+                        setState('livingroom-ac', 'on');
+                        
+                
+                    } else {
+                        livingRoomAC.classList.remove('on');
+                        livingRoomAC.classList.add('off');
+                        livingRoomACBtn.textContent = 'AUTO (OFF)';
+                        livingRoomACBtn.classList.remove('bg-blue-500');
+                        livingRoomACBtn.classList.add('bg-gray-600');
+                        setState('livingroom-ac', 'off');
+                        
+                    }
+                    
+                    livingRoomACBtn.disabled = true;
+                    setState('livingroom-ac-auto', 'true');
                 } else {
-                    livingRoomAC.classList.remove('on');
-                    livingRoomAC.classList.add('off');
-                    livingRoomACBtn.textContent = 'AUTO (OFF)';
-                    livingRoomACBtn.classList.remove('bg-blue-500');
-                    livingRoomACBtn.classList.add('bg-gray-600');
-                    setState('livingroom-ac', 'off');
+                    livingRoomACBtn.disabled = false;
                     
-                    // Temperature and humidity rise when AC is off
-                    updateTemperature(0.3);
-                    updateHumidity(1);
+                    if (livingRoomACBtn.textContent.includes('AUTO')) {
+                        livingRoomACBtn.textContent = livingRoomAC.classList.contains('on') ? 'ON' : 'OFF';
+                    }
+                    
+                    setState('livingroom-ac-auto', 'false');
                 }
                 
-                livingRoomACBtn.disabled = true;
-                setState('livingroom-ac-auto', 'true');
-            } else {
-                livingRoomACBtn.disabled = false;
-                
-                if (livingRoomACBtn.textContent.includes('AUTO')) {
-                    livingRoomACBtn.textContent = livingRoomAC.classList.contains('on') ? 'ON' : 'OFF';
-                }
-                
-                setState('livingroom-ac-auto', 'false');
+                // Update room indicators
+                updateRoomIndicators();
+
             }
-            
-            // Update room indicators
-            updateRoomIndicators();
-            
-            // Randomly fluctuate temperature and humidity
-            if (Math.random() > 0.7) {
-                updateTemperature((Math.random() - 0.5) * 0.5);
-            }
-            
-            if (Math.random() > 0.7) {
-                updateHumidity(Math.floor((Math.random() - 0.5) * 3));
+            catch (err) {
+                console.error(err);
             }
         }
         
@@ -1111,16 +1150,16 @@
         livingRoomACAuto.addEventListener('change', simulateAutoMode);
 
         // Initialize bathroom auto mode
-        setInterval(simulateBathroomAutoMode, 5000);
+        setInterval(simulateBathroomAutoMode, 1000);
         
         // Initialize auto mode simulation
-        setInterval(simulateAutoMode, 8000);
+        setInterval(simulateAutoMode, 2000);
         
         // Initialize stats display
         function initializeStats() {
             // Set initial temperature
             temperatureValue.textContent = getState('temperature') + '°C';
-            const tempPercentage = ((parseFloat(getState('temperature')) - 16) / (30 - 16)) * 100;
+            const tempPercentage = ((parseFloat(getState('temperature')) - (-40)) / (80 - (-40))) * 100;
             temperatureBar.style.width = tempPercentage + '%';
             
             // Set initial humidity
@@ -1143,111 +1182,18 @@
             }
         }
         
+        // Initial simulation
+        simulateBathroomAutoMode();
+        simulateAutoMode();
         initializeStats();
+        updateTemperature();
+        updateHumidity();
         
         // Initial page setup
         navigateTo('main-page');
+
+        setInterval(updateTemperature, 600);
+        setInterval(updateHumidity, 800);
     </script>
-
-    <script>
-  async function syncWithESP32() {
-    const BASE_URL = "http://localhost:8180";
-    const res = await fetch(BASE_URL + "/api/status");
-    const data = await res.json();
-
-    // Temperature & Humidity
-    document.getElementById('temperature-value').textContent = data.temperature.toFixed(1) + '°C';
-    document.getElementById('humidity-value').textContent = data.humidity.toFixed(0) + '%';
-
-    // Bedroom Lights
-    const b1 = document.getElementById('bedroom-light-1');
-    const b2 = document.getElementById('bedroom-light-2');
-    const b1Btn = document.getElementById('bedroom-light-1-btn');
-    const b2Btn = document.getElementById('bedroom-light-2-btn');
-    b1.className = 'light ' + (data.bedroomLights[0] ? 'on' : 'off');
-    b2.className = 'light ' + (data.bedroomLights[1] ? 'on' : 'off');
-    b1Btn.textContent = data.bedroomLights[0] ? 'ON' : 'OFF';
-    b2Btn.textContent = data.bedroomLights[1] ? 'ON' : 'OFF';
-    b1Btn.disabled = data.modeBedroom;
-    b2Btn.disabled = data.modeBedroom;
-    document.getElementById('bedroom-auto').checked = data.modeBedroom;
-
-    // Living Room Lights
-    for (let i = 0; i < 3; i++) {
-      const el = document.getElementById(`living-room-light-${i + 1}`);
-      const btn = document.getElementById(`living-room-light-${i + 1}-btn`);
-      el.className = 'light ' + (data.livingLights[i] ? 'on' : 'off');
-      btn.textContent = data.livingLights[i] ? 'ON' : 'OFF';
-      btn.disabled = data.modeLiving;
-    }
-    document.getElementById('living-room-lights-auto').checked = data.modeLiving;
-
-    // Living Room AC
-    const acEl = document.getElementById('living-room-ac');
-    const acBtn = document.getElementById('living-room-ac-btn');
-    acEl.className = 'ac ' + (data.ac ? 'on' : 'off');
-    acBtn.textContent = data.ac ? 'ON' : 'OFF';
-    acBtn.disabled = data.modeAC;
-    document.getElementById('living-room-ac-auto').checked = data.modeAC;
-
-    // Bathroom light
-    document.getElementById('bathroom-light').className = 'light ' + (data.bathroomLight ? 'on' : 'off');
-    document.getElementById('bathroom-status').textContent = 'AUTO (' + (data.bathroomLight ? 'ON' : 'OFF') + ')';
-  }
-
-  async function postControl(section, index, state) {
-    await fetch('/api/control', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `section=${section}&index=${index}&state=${state}`
-    });
-    syncWithESP32();
-  }
-
-  async function postMode(target, state) {
-    await fetch('/api/mode', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `target=${target}&state=${state}`
-    });
-    syncWithESP32();
-  }
-
-  // Listeners
-  document.getElementById('bedroom-light-1-btn').onclick = () => {
-    const state = document.getElementById('bedroom-light-1').classList.contains('on') ? 'off' : 'on';
-    postControl('bedroom', 0, state);
-  };
-  document.getElementById('bedroom-light-2-btn').onclick = () => {
-    const state = document.getElementById('bedroom-light-2').classList.contains('on') ? 'off' : 'on';
-    postControl('bedroom', 1, state);
-  };
-
-  for (let i = 0; i < 3; i++) {
-    document.getElementById(`living-room-light-${i + 1}-btn`).onclick = () => {
-      const state = document.getElementById(`living-room-light-${i + 1}`).classList.contains('on') ? 'off' : 'on';
-      postControl('living', i, state);
-    };
-  }
-
-  document.getElementById('living-room-ac-btn').onclick = () => {
-    const state = document.getElementById('living-room-ac').classList.contains('on') ? 'off' : 'on';
-    postControl('ac', 0, state);
-  };
-
-  document.getElementById('bedroom-auto').onchange = (e) => {
-    postMode('bedroom', e.target.checked ? 'auto' : 'manual');
-  };
-  document.getElementById('living-room-lights-auto').onchange = (e) => {
-    postMode('living', e.target.checked ? 'auto' : 'manual');
-  };
-  document.getElementById('living-room-ac-auto').onchange = (e) => {
-    postMode('ac', e.target.checked ? 'auto' : 'manual');
-  };
-
-  setInterval(syncWithESP32, 5000);
-  syncWithESP32();
-</script>
-
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9502f39d141e1e5e',t:'MTc0OTk5OTc3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

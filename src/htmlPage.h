@@ -712,69 +712,78 @@ String smartHomeHTML = R"rawliteral(
         const energyBar = document.getElementById('energy-bar');
 
         // Toggle light function
-        function toggleLight(light, button, stateKey) {
-            fetch("/api/light?id=" + button.id)
-            .then(res => res.text())
+        async function toggleLight(light, button, stateKey) {
+            try{
+                const res = await fetch("/api/light?id=" + button.id);
 
-            if (light.classList.contains('off')) {
-                light.classList.remove('off');
-                light.classList.add('on');
-                button.textContent = 'ON';
-                button.classList.remove('bg-gray-600');
-                button.classList.add('bg-yellow-500');
-                setState(stateKey, 'on');
-                
-                // Increase energy usage when turning on lights
-                updateEnergyUsage(10);
-            } else {
-                light.classList.remove('on');
-                light.classList.add('off');
-                button.textContent = 'OFF';
-                button.classList.remove('bg-yellow-500');
-                button.classList.add('bg-gray-600');
-                setState(stateKey, 'off');
-                
-                // Decrease energy usage when turning off lights
-                updateEnergyUsage(-10);
+                if (light.classList.contains('off')) {
+                    light.classList.remove('off');
+                    light.classList.add('on');
+                    button.textContent = 'ON';
+                    button.classList.remove('bg-gray-600');
+                    button.classList.add('bg-yellow-500');
+                    setState(stateKey, 'on');
+                    
+                    // Increase energy usage when turning on lights
+                    updateEnergyUsage(10);
+                } else {
+                    light.classList.remove('on');
+                    light.classList.add('off');
+                    button.textContent = 'OFF';
+                    button.classList.remove('bg-yellow-500');
+                    button.classList.add('bg-gray-600');
+                    setState(stateKey, 'off');
+                    
+                    // Decrease energy usage when turning off lights
+                    updateEnergyUsage(-10);
+                }
+            }
+            catch (err) {
+                console.error(err);
             }
         }
 
         // Toggle AC function
-        function toggleAC(ac, button) {
-            fetch("/api/ac/light")
-            .then(res => res.text())
+        async function toggleAC(ac, button) {
+            try{
+                const res = await fetch("/api/ac/light");
 
-            if (ac.classList.contains('off')) {
-                ac.classList.remove('off');
-                ac.classList.add('on');
-                button.textContent = 'ON';
-                button.classList.remove('bg-gray-600');
-                button.classList.add('bg-blue-500');
-                setState('livingroom-ac', 'on');
-                
-                // Increase energy usage when turning on AC
-                updateEnergyUsage(30);
-                
+                if (ac.classList.contains('off')) {
+                    ac.classList.remove('off');
+                    ac.classList.add('on');
+                    button.textContent = 'ON';
+                    button.classList.remove('bg-gray-600');
+                    button.classList.add('bg-blue-500');
+                    setState('livingroom-ac', 'on');
+                    
+                    // Increase energy usage when turning on AC
+                    updateEnergyUsage(30);
+                    
 
-            } else {
-                ac.classList.remove('on');
-                ac.classList.add('off');
-                button.textContent = 'OFF';
-                button.classList.remove('bg-blue-500');
-                button.classList.add('bg-gray-600');
-                setState('livingroom-ac', 'off');
-                
-                // Decrease energy usage when turning off AC
-                updateEnergyUsage(-30);
-                
+                } else {
+                    ac.classList.remove('on');
+                    ac.classList.add('off');
+                    button.textContent = 'OFF';
+                    button.classList.remove('bg-blue-500');
+                    button.classList.add('bg-gray-600');
+                    setState('livingroom-ac', 'off');
+                    
+                    // Decrease energy usage when turning off AC
+                    updateEnergyUsage(-30);
+                    
+                }
+            }
+            catch (err) {
+                console.error(err);
             }
         }
         
         // Update temperature
-        function updateTemperature() {
-            fetch("/api/status/temperature")
-            .then(res => res.json())
-            .then(data => {
+        async function updateTemperature() {
+            try{
+                const res = await fetch("/api/status/temperature");
+                const data = res.json();
+            
                 var change = parseFloat(data.temperature);
             
                 let currentTemp = parseFloat(getState('temperature'));
@@ -790,14 +799,18 @@ String smartHomeHTML = R"rawliteral(
                 // Update temperature bar (16°C to 30°C range)
                 const percentage = ((currentTemp - (-40)) / (80 - (-40))) * 100;
                 temperatureBar.style.width = percentage + '%';
-            });
+            }
+            catch (err) {
+                console.error(err);
+            }
         }
         
         // Update humidity
-        function updateHumidity() {
-            fetch("/api/status/humidity")
-            .then(res => res.json())
-            .then(data => {
+        async function updateHumidity() {
+            try{
+                const res = await fetch("/api/status/humidity");
+                const data = res.json();
+            
                 var change = parseFloat(data.humidity);
             
 
@@ -815,7 +828,10 @@ String smartHomeHTML = R"rawliteral(
                 const circumference = 2 * Math.PI * 54;
                 const offset = circumference - (currentHumidity / 100) * circumference;
                 humidityCircle.style.strokeDashoffset = offset;
-            });
+            }
+            catch (err) {
+                console.error(err);
+            }
         }
         
         // Update energy usage
@@ -845,10 +861,10 @@ String smartHomeHTML = R"rawliteral(
         }
 
         // Simulate automatic mode for bathroom
-        function simulateBathroomAutoMode() {
-            fetch("/api/auto/bathroom")
-            .then(res => res.json())
-            .then(data => {
+        async function simulateBathroomAutoMode() {
+            try{
+                const res = await fetch("/api/auto/bathroom");
+                const data = res.json();
 
                 const isOn = data.state;
                 if (isOn) {
@@ -870,20 +886,23 @@ String smartHomeHTML = R"rawliteral(
                     
 
                 }
-            });
+            }
+            catch (err) {
+                console.error(err);
+            }
         }
 
         // Simulate automatic mode for other rooms
-        function simulateAutoMode() {
-            fetch("/api/auto/other?bedRoomMode=" + (bedroomAuto.checked? 1 : 0) + "&"
-                 + "livingRoomLightMode=" + (livingRoomLightsAuto.checked? 1 : 0) + "&"
-                 + "livingRoomAcMode=" + (livingRoomACAuto.checked? 1 : 0))
-            .then(res => res.json())
-            .then(data => {
+        async function simulateAutoMode() {
+            try{
+                const res = await fetch("/api/auto/other?bedRoomMode=" + (bedroomAuto.checked? 1 : 0) + "&"
+                    + "livingRoomLightMode=" + (livingRoomLightsAuto.checked? 1 : 0) + "&"
+                    + "livingRoomAcMode=" + (livingRoomACAuto.checked? 1 : 0));
+                const data = res.json();
+        
                 const livingRoomOn = data.livingRoom;
                 const bedroomOn = data.bedRoom;
                 const acOn = data.ac;
-
 
 
                 // Bedroom auto mode
@@ -1045,7 +1064,10 @@ String smartHomeHTML = R"rawliteral(
                 // Update room indicators
                 updateRoomIndicators();
 
-            });
+            }
+            catch (err) {
+                console.error(err);
+            }
         }
         
         // Update room indicators on the main page
@@ -1133,7 +1155,7 @@ String smartHomeHTML = R"rawliteral(
         livingRoomACAuto.addEventListener('change', simulateAutoMode);
 
         // Initialize bathroom auto mode
-        setInterval(simulateBathroomAutoMode, 2000);
+        setInterval(simulateBathroomAutoMode, 1000);
         
         // Initialize auto mode simulation
         setInterval(simulateAutoMode, 2000);
@@ -1175,8 +1197,8 @@ String smartHomeHTML = R"rawliteral(
         // Initial page setup
         navigateTo('main-page');
 
-        setInterval(updateTemperature, 350);
-        setInterval(updateHumidity, 350);
+        setInterval(updateTemperature, 600);
+        setInterval(updateHumidity, 800);
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9502f39d141e1e5e',t:'MTc0OTk5OTc3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
