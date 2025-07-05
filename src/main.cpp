@@ -65,8 +65,11 @@ void TaskPIRLiving(void *param) {
     pirLiving = digitalRead(PIR_LIVING);
     if (modeLiving) {
       digitalWrite(LED_LIVING_1, pirLiving);
+      livingLights[0] = pirLiving;
       digitalWrite(LED_LIVING_2, pirLiving);
+      livingLights[1] = pirLiving;
       digitalWrite(LED_LIVING_3, pirLiving);
+      livingLights[2] = pirLiving;
     } else {
       digitalWrite(LED_LIVING_1, livingLights[0]);
       digitalWrite(LED_LIVING_2, livingLights[1]);
@@ -81,7 +84,9 @@ void TaskPIRBedroom(void *param) {
     pirBedroom = digitalRead(PIR_BEDROOM);
     if (modeBedroom) {
       digitalWrite(LED_BEDROOM_1, pirBedroom);
+       bedroomLights[0] = pirBedroom;
       digitalWrite(LED_BEDROOM_2, pirBedroom);
+       bedroomLights[1] = pirBathroom;
       Serial.println("LED are on");
     } else {
       digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
@@ -138,7 +143,7 @@ void setup() {
 
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *req){
-    req->send_P(200, "text/html", smartHomeHTML);
+    req->send(200, "text/html", smartHomeHTML);
   });
 
   server.on("/api/light", HTTP_GET, [](AsyncWebServerRequest *req){
@@ -225,11 +230,11 @@ void setup() {
   server.begin();
 
 
-  xTaskCreate(TaskDHT, "DHT", 2048, NULL, 1, NULL);
-  xTaskCreate(TaskPIRLiving, "PIR_Living", 2048, NULL, 1, NULL);
-  xTaskCreate(TaskPIRBedroom, "PIR_Bedroom", 2048, NULL, 1, NULL);
-  xTaskCreate(TaskPIRBathroom, "PIR_Bathroom", 2048, NULL, 1, NULL);
-  xTaskCreate(TaskACAuto, "AC_Auto", 2048, NULL, 1, NULL);
+  xTaskCreate(TaskDHT, "DHT", 4096, NULL, 1, NULL);
+  xTaskCreate(TaskPIRLiving, "PIR_Living", 4096, NULL, 1, NULL);
+  xTaskCreate(TaskPIRBedroom, "PIR_Bedroom", 4096, NULL, 1, NULL);
+  xTaskCreate(TaskPIRBathroom, "PIR_Bathroom", 4096, NULL, 1, NULL);
+  xTaskCreate(TaskACAuto, "AC_Auto", 4096, NULL, 1, NULL);
   
   //vTaskStartScheduler();
 }
@@ -237,66 +242,3 @@ void setup() {
 void loop() {
   // Everything is RTOS-based
 }
-
-
-// void TaskDHT(void *param) {
-//   Serial.print('1');
-//   while (true) {
-//     float t = dht.readTemperature();
-//     float h = dht.readHumidity();
-//     if (!isnan(t)) temperature = t;
-//     if (!isnan(h)) humidity = h;
-//     vTaskDelay(400 / portTICK_PERIOD_MS);
-//   }
-// }
-
-// void TaskPIRLiving(void *param) {
-//   while (true) {
-//     pirLiving = digitalRead(PIR_LIVING);
-//     if (modeLiving) {
-//       digitalWrite(LED_LIVING_1, pirLiving);
-//       digitalWrite(LED_LIVING_2, pirLiving);
-//       digitalWrite(LED_LIVING_3, pirLiving);
-//     } else {
-//       digitalWrite(LED_LIVING_1, livingLights[0]);
-//       digitalWrite(LED_LIVING_2, livingLights[1]);
-//       digitalWrite(LED_LIVING_3, livingLights[2]);
-//     }
-//     vTaskDelay(100 / portTICK_PERIOD_MS);
-//   }
-// }
-
-// void TaskPIRBedroom(void *param) {
-//   while (true) {
-//     pirBedroom = digitalRead(PIR_BEDROOM);
-//     if (modeBedroom) {
-//       digitalWrite(LED_BEDROOM_1, pirBedroom);
-//       digitalWrite(LED_BEDROOM_2, pirBedroom);
-//       Serial.println("LED are on");
-//     } else {
-//       digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
-//       digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
-//     }
-//     vTaskDelay(300 / portTICK_PERIOD_MS);
-//   }
-// }
-
-// void TaskPIRBathroom(void *param) {
-//   while (true) {
-//     pirBathroom = digitalRead(PIR_BATHROOM);
-//     bathroomLight = pirBathroom;
-//     digitalWrite(LED_BATHROOM, bathroomLight);
-//     vTaskDelay(500 / portTICK_PERIOD_MS);
-//   }
-// }
-
-// void TaskACAuto(void *param) {
-//   while (true) {
-//     if (modeAC) {
-//       if (temperature >= 27) acState = true;
-//       else if (temperature <= 22) acState = false;
-//     }
-//     digitalWrite(LED_AC, acState);
-//     vTaskDelay(1050 / portTICK_PERIOD_MS);
-//   }
-// }
