@@ -64,12 +64,14 @@ void TaskPIRLiving(void *param) {
   while (true) {
     pirLiving = digitalRead(PIR_LIVING);
     if (modeLiving) {
-      digitalWrite(LED_LIVING_1, pirLiving);
-      livingLights[0] = pirLiving;
-      digitalWrite(LED_LIVING_2, pirLiving);
-      livingLights[1] = pirLiving;
-      digitalWrite(LED_LIVING_3, pirLiving);
-      livingLights[2] = pirLiving;
+      if(LDR_SENSOR == HIGH){
+        digitalWrite(LED_LIVING_1, pirLiving);
+        livingLights[0] = pirLiving;
+        digitalWrite(LED_LIVING_2, pirLiving);
+        livingLights[1] = pirLiving;
+        digitalWrite(LED_LIVING_3, pirLiving);
+        livingLights[2] = pirLiving;
+      }
     } else {
       digitalWrite(LED_LIVING_1, livingLights[0]);
       digitalWrite(LED_LIVING_2, livingLights[1]);
@@ -83,10 +85,12 @@ void TaskPIRBedroom(void *param) {
   while (true) {
     pirBedroom = digitalRead(PIR_BEDROOM);
     if (modeBedroom) {
-      digitalWrite(LED_BEDROOM_1, pirBedroom);
-       bedroomLights[0] = pirBedroom;
-      digitalWrite(LED_BEDROOM_2, pirBedroom);
-       bedroomLights[1] = pirBathroom;
+      if(LDR_SENSOR == HIGH){
+        digitalWrite(LED_BEDROOM_1, pirBedroom);
+        bedroomLights[0] = pirBedroom;
+        bedroomLights[1] = pirBathroom;
+        digitalWrite(LED_BEDROOM_2, pirBedroom);
+      } 
       Serial.println("LED are on");
     } else {
       digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
