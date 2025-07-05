@@ -64,7 +64,7 @@ void TaskPIRLiving(void *param) {
   while (true) {
     pirLiving = digitalRead(PIR_LIVING);
     if (modeLiving) {
-      if(LDR_SENSOR == HIGH){
+      if((digitalRead(LDR_SENSOR)) == HIGH){
         digitalWrite(LED_LIVING_1, pirLiving);
         livingLights[0] = pirLiving;
         digitalWrite(LED_LIVING_2, pirLiving);
@@ -85,7 +85,7 @@ void TaskPIRBedroom(void *param) {
   while (true) {
     pirBedroom = digitalRead(PIR_BEDROOM);
     if (modeBedroom) {
-      if(LDR_SENSOR == HIGH){
+      if((digitalRead(LDR_SENSOR)) == HIGH){
         digitalWrite(LED_BEDROOM_1, pirBedroom);
         bedroomLights[0] = pirBedroom;
         bedroomLights[1] = pirBathroom;
@@ -119,6 +119,7 @@ void TaskACAuto(void *param) {
     vTaskDelay(1050 / portTICK_PERIOD_MS);
   }
 }
+
 
 // ------------------------ Setup ------------------------
 void setup() {
@@ -219,8 +220,8 @@ void setup() {
       modeAC = request->getParam("livingRoomAcMode")->value().toInt();
 
       String json = "{";
-      json += "\"livingRoom\": " + String(pirLiving) + ",";
-      json += "\"bedRoom\": " + String(pirBedroom) + ",";
+      json += "\"livingRoom\": " + String((pirLiving == (digitalRead(LDR_SENSOR)) && (digitalRead(LDR_SENSOR)) == 1)) + ",";
+      json += "\"bedRoom\": " + String((pirBedroom == (digitalRead(LDR_SENSOR)) && (digitalRead(LDR_SENSOR)) == 1)) + ",";
       json += "\"ac\": " + String(acState);
       json += "}";
       request->send(200, "application/json", json);
