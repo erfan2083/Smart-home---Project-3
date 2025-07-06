@@ -88,7 +88,7 @@ void TaskPIRBedroom(void *param) {
       if((digitalRead(LDR_SENSOR)) == HIGH){
         digitalWrite(LED_BEDROOM_1, pirBedroom);
         bedroomLights[0] = pirBedroom;
-        bedroomLights[1] = pirBathroom;
+        bedroomLights[1] = bedroomLights[0];
         digitalWrite(LED_BEDROOM_2, pirBedroom);
       } 
       Serial.println("LED are on");
