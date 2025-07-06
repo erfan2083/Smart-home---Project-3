@@ -56,7 +56,7 @@ void TaskDHT(void *param) {
     float h = dht.readHumidity();
     if (!isnan(t)) temperature = t;
     if (!isnan(h)) humidity = h;
-    vTaskDelay(400 / portTICK_PERIOD_MS);
+    vTaskDelay(700 / portTICK_PERIOD_MS);
   }
 }
 
@@ -77,7 +77,7 @@ void TaskPIRLiving(void *param) {
       digitalWrite(LED_LIVING_2, livingLights[1]);
       digitalWrite(LED_LIVING_3, livingLights[2]);
     }
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
   }
 }
 
