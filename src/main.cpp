@@ -25,6 +25,7 @@
 #define LED_BATHROOM 33
 #define LED_AC 27
 
+
 // ------------------------ Global Variables ------------------------
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
