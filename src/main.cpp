@@ -113,26 +113,31 @@ void TaskDisplay(void *param) {
     else
       display.drawBitmap(108, 0, sunIcon, 16, 16, WHITE);
 
-    // Living Room
-    display.setCursor(0, 16);
-    display.print("Living:");
-    display.print(" L1:"); display.print(digitalRead(2));
-    display.print(" L2:"); display.print(digitalRead(4));
-    display.print(" L3:"); display.println(digitalRead(8));
 
-    // Bedroom
-    display.print("Bedroom:");
-    display.print(" L1:"); display.print(digitalRead(7));
-    display.print(" L2:"); display.println(digitalRead(32));
+    // display.println("--------------------");
+    // // Living Room
+    // display.setCursor(0, 16);
+    // display.print("Living:");
+    // display.print(" L1:"); display.print(digitalRead(2));
+    // display.print(" L2:"); display.print(digitalRead(4));
+    // display.print(" L3:"); display.println(digitalRead(8));
 
-    // Bathroom & AC
-    display.print("Bath PIR: "); display.println(digitalRead(0));
-    display.print("AC: "); display.println(digitalRead(27));
+    // // Bedroom
+    // display.print("Bedroom:");
+    // display.print(" L1:"); display.print(digitalRead(7));
+    // display.print(" L2:"); display.println(digitalRead(32));
 
-    // Temperature / Humidity
-    extern float temperature, humidity;
-    display.printf("T:%.1fC H:%.1f%%\n", temperature, humidity);
+    // // Bathroom & AC
+    // display.print("Bath PIR: "); display.println(digitalRead(0));
+    // display.print("AC: "); display.println(digitalRead(27));
 
+    // // Temperature / Humidity
+    // extern float temperature, humidity;
+    // display.printf("T:%.1fC H:%.1f%%\n", temperature, humidity);
+
+    // display.display();
+
+    display.drawRect(0, 16, 128, 48, WHITE);
     display.display();
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
