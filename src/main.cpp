@@ -5,6 +5,8 @@
 #include <AsyncTCP.h>
 #include <DHT.h>
 #include <htmlPage.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 
 // ------------------------ Pin Definitions ------------------------
