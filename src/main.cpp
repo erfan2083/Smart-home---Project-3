@@ -33,6 +33,50 @@ const char* password = "";
 AsyncWebServer server(80);
 DHT dht(DHTPIN, DHTTYPE);
 
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET -1
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+const unsigned char sunIcon [] PROGMEM = {
+  0b00000100, 0b00000000,
+  0b00000100, 0b00000000,
+  0b10100101, 0b01000000,
+  0b01011010, 0b10000000,
+  0b00111111, 0b00000000,
+  0b00111111, 0b00000000,
+  0b01011010, 0b10000000,
+  0b10100101, 0b01000000,
+  0b00000100, 0b00000000,
+  0b00000100, 0b00000000,
+  0b00000000, 0b00000000,
+  0b00000000, 0b00000000,
+  0b00000000, 0b00000000,
+  0b00000000, 0b00000000,
+  0b00000000, 0b00000000,
+  0b00000000, 0b00000000
+};
+
+const unsigned char moonIcon [] PROGMEM = {
+  0b00000111, 0b00000000,
+  0b00011111, 0b10000000,
+  0b00111111, 0b11000000,
+  0b00111100, 0b00000000,
+  0b01111000, 0b00000000,
+  0b01110000, 0b00000000,
+  0b01110000, 0b00000000,
+  0b01110000, 0b00000000,
+  0b01111000, 0b00000000,
+  0b00111100, 0b00000000,
+  0b00111111, 0b11000000,
+  0b00011111, 0b10000000,
+  0b00000111, 0b00000000,
+  0b00000000, 0b00000000,
+  0b00000000, 0b00000000,
+  0b00000000, 0b00000000
+};
+
+
 float temperature = 20.0;
 float humidity = 40.0;
 
@@ -53,6 +97,47 @@ bool pirBathroom = false;
 bool bathroomLight = false;
 
 // ------------------------ RTOS Tasks ------------------------
+void TaskDisplay(void *param) {
+  while (true) {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+
+    // Header
+    display.setCursor(0, 0);
+    display.println("EFN Smart Home");
+
+    // Icons
+    if (isNight())
+      display.drawBitmap(108, 0, moonIcon, 16, 16, WHITE);
+    else
+      display.drawBitmap(108, 0, sunIcon, 16, 16, WHITE);
+
+    // Living Room
+    display.setCursor(0, 16);
+    display.print("Living:");
+    display.print(" L1:"); display.print(digitalRead(2));
+    display.print(" L2:"); display.print(digitalRead(4));
+    display.print(" L3:"); display.println(digitalRead(8));
+
+    // Bedroom
+    display.print("Bedroom:");
+    display.print(" L1:"); display.print(digitalRead(7));
+    display.print(" L2:"); display.println(digitalRead(32));
+
+    // Bathroom & AC
+    display.print("Bath PIR: "); display.println(digitalRead(0));
+    display.print("AC: "); display.println(digitalRead(27));
+
+    // Temperature / Humidity
+    extern float temperature, humidity;
+    display.printf("T:%.1fC H:%.1f%%\n", temperature, humidity);
+
+    display.display();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  }
+}
+
 void TaskDHT(void *param) {
   while (true) {
     float t = dht.readTemperature();
@@ -149,6 +234,12 @@ void setup() {
   }
   Serial.println("\nWiFi connected: " + WiFi.localIP().toString());
 
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("OLED init failed");
+    for(;;);
+  }
+  display.clearDisplay();
+  display.display();
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *req){
     req->send(200, "text/html", smartHomeHTML);
@@ -243,6 +334,7 @@ void setup() {
   xTaskCreate(TaskPIRBedroom, "PIR_Bedroom", 4096, NULL, 1, NULL);
   xTaskCreate(TaskPIRBathroom, "PIR_Bathroom", 4096, NULL, 1, NULL);
   xTaskCreate(TaskACAuto, "AC_Auto", 4096, NULL, 1, NULL);
+  xTaskCreate(TaskDisplay, "OLED", 4096, NULL, 1, NULL);
   
   //vTaskStartScheduler();
 }
