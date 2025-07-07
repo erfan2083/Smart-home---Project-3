@@ -108,7 +108,7 @@ void TaskDisplay(void *param) {
     display.println("EFN Smart Home");
 
     // Icons
-    if (isNight())
+    if ((digitalRead(LDR_SENSOR)))
       display.drawBitmap(108, 0, moonIcon, 16, 16, WHITE);
     else
       display.drawBitmap(108, 0, sunIcon, 16, 16, WHITE);
