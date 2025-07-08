@@ -151,13 +151,13 @@ void TaskDisplay(void *param) {
 
     // Livinroom lights
     livingLights[0]? display.fillRect(22, 46, 4, 4, WHITE) : display.drawRect(22, 46, 4, 4, WHITE);
-    livingLights[0]? display.fillRect(64, 46, 4, 4, WHITE) : display.drawRect(64, 46, 4, 4, WHITE);
-    livingLights[0]? display.fillRect(106, 46, 4, 4, WHITE) : display.drawRect(106, 46, 4, 4, WHITE);
+    livingLights[1]? display.fillRect(64, 46, 4, 4, WHITE) : display.drawRect(64, 46, 4, 4, WHITE);
+    livingLights[2]? display.fillRect(106, 46, 4, 4, WHITE) : display.drawRect(106, 46, 4, 4, WHITE);
 
     // AC
     acState? display.fillRect(61, 56, 10, 4, WHITE) : display.drawRect(61, 56, 10, 4, WHITE);
 
-    
+
     display.display();
     vTaskDelay(1783 / portTICK_PERIOD_MS);
   }
@@ -185,6 +185,11 @@ void TaskPIRLiving(void *param) {
         digitalWrite(LED_LIVING_3, pirLiving);
         livingLights[2] = pirLiving;
       }
+      else {
+        digitalWrite(LED_LIVING_1, livingLights[0]);
+        digitalWrite(LED_LIVING_2, livingLights[1]);
+        digitalWrite(LED_LIVING_3, livingLights[2]);
+      }
     } else {
       digitalWrite(LED_LIVING_1, livingLights[0]);
       digitalWrite(LED_LIVING_2, livingLights[1]);
@@ -203,6 +208,10 @@ void TaskPIRBedroom(void *param) {
         bedroomLights[0] = pirBedroom;
         bedroomLights[1] = bedroomLights[0];
         digitalWrite(LED_BEDROOM_2, pirBedroom);
+      }
+      else {
+        digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
+        digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
       } 
       Serial.println("LED are on");
     } else {
