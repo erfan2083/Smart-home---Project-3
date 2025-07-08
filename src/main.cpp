@@ -186,6 +186,9 @@ void TaskPIRLiving(void *param) {
         livingLights[2] = pirLiving;
       }
       else {
+        livingLights[0] = false;
+        livingLights[1] = false;
+        livingLights[2] = false;
         digitalWrite(LED_LIVING_1, livingLights[0]);
         digitalWrite(LED_LIVING_2, livingLights[1]);
         digitalWrite(LED_LIVING_3, livingLights[2]);
@@ -210,6 +213,8 @@ void TaskPIRBedroom(void *param) {
         digitalWrite(LED_BEDROOM_2, pirBedroom);
       }
       else {
+        bedroomLights[0] = false;
+        bedroomLights[1] = false;
         digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
         digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
       } 
