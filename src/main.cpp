@@ -137,13 +137,29 @@ void TaskDisplay(void *param) {
 
     // display.display();
 
+    // Apartment drawing
     display.drawRect(0, 16, 128, 48, WHITE);
     display.drawRect(0, 16, 32, 22, WHITE);
     display.drawRect(100, 16, 28, 22, WHITE);
 
+    // Bedroom lights
+    bedroomLights[0]? display.fillRect(6, 22, 4, 4, WHITE) : display.drawRect(6, 22, 4, 4, WHITE);
+    bedroomLights[1]? display.fillRect(22, 30, 4, 4, WHITE) : display.drawRect(22, 30, 4, 4, WHITE);
+
+    // Bathroom light
+    pirBathroom? display.fillRect(113, 22, 4, 4, WHITE) : display.drawRect(113, 22, 4, 4, WHITE);
+
+    // Livinroom lights
+    livingLights[0]? display.fillRect(22, 46, 4, 4, WHITE) : display.drawRect(22, 46, 4, 4, WHITE);
+    livingLights[0]? display.fillRect(64, 46, 4, 4, WHITE) : display.drawRect(64, 46, 4, 4, WHITE);
+    livingLights[0]? display.fillRect(106, 46, 4, 4, WHITE) : display.drawRect(106, 46, 4, 4, WHITE);
+
+    // AC
+    acState? display.fillRect(61, 56, 10, 4, WHITE) : display.drawRect(61, 56, 10, 4, WHITE);
+
     
     display.display();
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(1783 / portTICK_PERIOD_MS);
   }
 }
 
