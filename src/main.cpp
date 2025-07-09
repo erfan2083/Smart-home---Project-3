@@ -114,29 +114,6 @@ void TaskDisplay(void *param) {
       display.drawBitmap(108, 0, sunIcon, 16, 16, WHITE);
 
 
-    // display.println("--------------------");
-    // // Living Room
-    // display.setCursor(0, 16);
-    // display.print("Living:");
-    // display.print(" L1:"); display.print(digitalRead(2));
-    // display.print(" L2:"); display.print(digitalRead(4));
-    // display.print(" L3:"); display.println(digitalRead(8));
-
-    // // Bedroom
-    // display.print("Bedroom:");
-    // display.print(" L1:"); display.print(digitalRead(7));
-    // display.print(" L2:"); display.println(digitalRead(32));
-
-    // // Bathroom & AC
-    // display.print("Bath PIR: "); display.println(digitalRead(0));
-    // display.print("AC: "); display.println(digitalRead(27));
-
-    // // Temperature / Humidity
-    // extern float temperature, humidity;
-    // display.printf("T:%.1fC H:%.1f%%\n", temperature, humidity);
-
-    // display.display();
-
     // Apartment drawing
     display.drawRect(0, 16, 128, 48, WHITE);
     display.drawRect(0, 16, 32, 22, WHITE);
@@ -218,7 +195,6 @@ void TaskPIRBedroom(void *param) {
         digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
         digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
       } 
-      Serial.println("LED are on");
     } else {
       digitalWrite(LED_BEDROOM_1, bedroomLights[0]);
       digitalWrite(LED_BEDROOM_2, bedroomLights[1]);
