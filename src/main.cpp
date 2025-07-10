@@ -261,7 +261,16 @@ void setup() {
   pinMode(LED_AC, OUTPUT);
 
   dht.begin();
+
+  
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("OLED init failed");
+    for(;;);
+  }
+  display.clearDisplay();
+  display.display();
   startUp();
+
 
   WiFi.begin(ssid, password, 6);
   while (WiFi.status() != WL_CONNECTED) {
@@ -270,12 +279,6 @@ void setup() {
   }
   Serial.println("\nWiFi connected: " + WiFi.localIP().toString());
 
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println("OLED init failed");
-    for(;;);
-  }
-  display.clearDisplay();
-  display.display();
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *req){
     req->send(200, "text/html", smartHomeHTML);
