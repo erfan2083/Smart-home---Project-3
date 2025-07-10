@@ -96,6 +96,7 @@ bool pirBedroom = false;
 bool pirBathroom = false;
 bool bathroomLight = false;
 
+
 // ------------------------ RTOS Tasks ------------------------
 void TaskDisplay(void *param) {
   while (true) {
@@ -224,6 +225,7 @@ void TaskACAuto(void *param) {
   }
 }
 
+
 // ------------------------ Function's ------------------------
 
 void startUp(){
@@ -241,11 +243,10 @@ void startUp(){
   display.display();
 }
 
+
 // ------------------------ Setup ------------------------
 void setup() {
   Serial.begin(115200);
-
-  startUp();
 
   pinMode(PIR_LIVING, INPUT);
   pinMode(PIR_BEDROOM, INPUT);
@@ -260,6 +261,7 @@ void setup() {
   pinMode(LED_AC, OUTPUT);
 
   dht.begin();
+  startUp();
 
   WiFi.begin(ssid, password, 6);
   while (WiFi.status() != WL_CONNECTED) {
