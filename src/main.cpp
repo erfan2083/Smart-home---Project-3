@@ -105,7 +105,8 @@ void TaskDisplay(void *param) {
 
     // Header
     display.setCursor(0, 0);
-    display.println("EFN Smart Home");
+    display.printf("T:%.1fC  H:%.1f%%\n", temperature, humidity);
+    //display.println("EFN Smart Home");
 
     // Icons
     if ((digitalRead(LDR_SENSOR)))
@@ -223,10 +224,28 @@ void TaskACAuto(void *param) {
   }
 }
 
+// ------------------------ Function's ------------------------
+
+void startUp(){
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(15, 10);
+  display.println("EFN");
+  display.setTextSize(1);
+  display.setCursor(15, 35);
+  display.println("Smart Home System");
+
+  // Optional: draw a horizontal line or icon
+  display.drawLine(0, 30, 128, 30, WHITE);
+  display.display();
+}
 
 // ------------------------ Setup ------------------------
 void setup() {
   Serial.begin(115200);
+
+  startUp();
 
   pinMode(PIR_LIVING, INPUT);
   pinMode(PIR_BEDROOM, INPUT);
