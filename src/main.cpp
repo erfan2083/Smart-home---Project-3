@@ -111,9 +111,9 @@ void TaskDisplay(void *param) {
 
     // Icons
     if ((digitalRead(LDR_SENSOR)))
-      display.drawBitmap(108, 0, moonIcon, 16, 16, WHITE);
+      display.drawBitmap(110, 0, moonIcon, 16, 16, WHITE);
     else
-      display.drawBitmap(108, 0, sunIcon, 16, 16, WHITE);
+      display.drawBitmap(110, 0, sunIcon, 16, 16, WHITE);
 
 
     // Apartment drawing
@@ -241,6 +241,7 @@ void startUp(){
   // Optional: draw a horizontal line or icon
   display.drawLine(0, 30, 128, 30, WHITE);
   display.display();
+  delay(2000);
 }
 
 
@@ -262,7 +263,7 @@ void setup() {
 
   dht.begin();
 
-  
+
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("OLED init failed");
     for(;;);
