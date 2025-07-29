@@ -33,11 +33,13 @@ const char* password = "";
 AsyncWebServer server(80);
 DHT dht(DHTPIN, DHTTYPE);
 
+// OLED Setup
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+// Icons for Day and Night
 const unsigned char sunIcon [] PROGMEM = {
   0b00001000, 0b00000000,
   0b00001000, 0b00000000,
@@ -85,7 +87,7 @@ bool modeLiving = false;
 bool modeBedroom = false;
 bool modeAC = false;
 
-// Manual state (only used if mode is manual)
+// Manual state 
 bool livingLights[3] = {false, false, false};
 bool bedroomLights[2] = {false, false};
 bool acState = false;
@@ -98,6 +100,8 @@ bool bathroomLight = false;
 
 
 // ------------------------ RTOS Tasks ------------------------
+
+// Task to continuously update OLED display
 void TaskDisplay(void *param) {
   while (true) {
     display.clearDisplay();
@@ -142,6 +146,7 @@ void TaskDisplay(void *param) {
   }
 }
 
+// Task to read DHT sensor and update temperature and humidity
 void TaskDHT(void *param) {
   while (true) {
     float t = dht.readTemperature();
@@ -152,6 +157,7 @@ void TaskDHT(void *param) {
   }
 }
 
+// Task to manage PIR and lighting in the living room
 void TaskPIRLiving(void *param) {
   while (true) {
     pirLiving = digitalRead(PIR_LIVING);
@@ -181,6 +187,7 @@ void TaskPIRLiving(void *param) {
   }
 }
 
+// Task to manage PIR and lighting in the bedroom
 void TaskPIRBedroom(void *param) {
   while (true) {
     pirBedroom = digitalRead(PIR_BEDROOM);
@@ -205,6 +212,7 @@ void TaskPIRBedroom(void *param) {
   }
 }
 
+// Task to manage PIR and lighting in the bathroom
 void TaskPIRBathroom(void *param) {
   while (true) {
     pirBathroom = digitalRead(PIR_BATHROOM);
@@ -214,6 +222,7 @@ void TaskPIRBathroom(void *param) {
   }
 }
 
+// Task to handle automatic AC control based on temperature
 void TaskACAuto(void *param) {
   while (true) {
     if (modeAC) {
@@ -228,6 +237,7 @@ void TaskACAuto(void *param) {
 
 // ------------------------ Function's ------------------------
 
+// Display startup intro screen
 void startUp(){
   display.clearDisplay();
   display.setTextSize(2);
@@ -238,7 +248,7 @@ void startUp(){
   display.setCursor(15, 35);
   display.println("Smart Home System");
 
-  // Optional: draw a horizontal line or icon
+  // draw a horizontal line
   display.drawLine(0, 30, 128, 30, WHITE);
   display.display();
   delay(2000);
@@ -246,9 +256,12 @@ void startUp(){
 
 
 // ------------------------ Setup ------------------------
+
+// Initializes hardware, sensors, OLED, WiFi, and API endpoints
 void setup() {
   Serial.begin(115200);
 
+  // Initialize Sensor and Output Pins
   pinMode(PIR_LIVING, INPUT);
   pinMode(PIR_BEDROOM, INPUT);
   pinMode(PIR_BATHROOM, INPUT);
@@ -261,9 +274,10 @@ void setup() {
   pinMode(LED_BATHROOM, OUTPUT);
   pinMode(LED_AC, OUTPUT);
 
-  dht.begin();
+  dht.begin(); // Initialize DHT sensor
+ 
 
-
+  // Initialize OLED Display
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("OLED init failed");
     for(;;);
@@ -273,6 +287,7 @@ void setup() {
   startUp();
 
 
+  // Connect to WiFi
   WiFi.begin(ssid, password, 6);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -281,9 +296,11 @@ void setup() {
   Serial.println("\nWiFi connected: " + WiFi.localIP().toString());
 
 
+  // Configure HTTP Server Routes
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *req){
     req->send(200, "text/html", smartHomeHTML);
   });
+
 
   server.on("/api/light", HTTP_GET, [](AsyncWebServerRequest *req){
     if (req->hasParam("id") ){
@@ -319,6 +336,7 @@ void setup() {
     req->send(200, "text/plain", "light done");
   });
 
+  // AC toggle endpoint
   server.on("/api/ac/light", HTTP_GET, [](AsyncWebServerRequest *req){
     acState = !acState;
     digitalWrite(LED_AC, acState);
@@ -326,6 +344,7 @@ void setup() {
     req->send(200, "text/plain", "ac done");
   });
 
+  // Temperature endpoint
   server.on("/api/status/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
     String json = "{";
     json += "\"temperature\": " + String(temperature);
@@ -333,6 +352,7 @@ void setup() {
     request->send(200, "application/json", json);
   });
 
+  // Humidity endpoint
   server.on("/api/status/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
     String json = "{";
     json += "\"humidity\": " + String(humidity);
@@ -340,6 +360,7 @@ void setup() {
     request->send(200, "application/json", json);
   });
 
+  // Bathroom PIR status
   server.on("/api/auto/bathroom", HTTP_GET, [](AsyncWebServerRequest *request){
     String json = "{";
     json += "\"state\": " + String(pirBathroom);
@@ -347,6 +368,7 @@ void setup() {
     request->send(200, "application/json", json);
   });
 
+  // Auto mode configuration endpoint
   server.on("/api/auto/other", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->hasParam("bedRoomMode") && request->hasParam("livingRoomLightMode") && request->hasParam("livingRoomAcMode")){
       modeBedroom = request->getParam("bedRoomMode")->value().toInt();
@@ -369,6 +391,7 @@ void setup() {
   server.begin();
 
 
+  // Auto mode configuration endpoint
   xTaskCreate(TaskDHT, "DHT", 4096, NULL, 1, NULL);
   xTaskCreate(TaskPIRLiving, "PIR_Living", 4096, NULL, 1, NULL);
   xTaskCreate(TaskPIRBedroom, "PIR_Bedroom", 4096, NULL, 1, NULL);
